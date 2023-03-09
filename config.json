@@ -1,0 +1,87 @@
+{
+    "setInput":{
+            "inpFileName": ["python"],
+            "inpLocalPath":"/home/mel/Dokumenty/M/NET4GAS/LSQ_spracovanie_pritokov/data"
+       },
+    "setInterval":{
+            "beg":"2021-01-01 00:00:00",
+            "end":"2022-12-31 00:00:00",
+            "dbeg":"2022-06-01 00:00:00",
+            "dend":"2022-12-31 00:00:00"
+    },
+    "setLSQ":{
+            "maxIter":50,
+            "epsVal":0.001
+    },
+    "setModel":{
+            "limitRelativeUfG":1000.03,
+            "calcWeights":1,
+            "addIntercept":0,
+            "probUp": 0.975 
+    },
+    "setSmoothing":{
+                "smoothingMethod":"movingAverage",
+                "smoothingBin":5,
+                "smoothingAlt": "center"
+    },
+    "setStations":{
+            "stations": [
+             "Lanžhot ENTRY",
+             "HSK ENTRY",
+             "Olbernhau ENTRY",
+             "Brandov ENTRY",
+             "EUGAL ENTRY",
+             "Cieszyn EXIT",
+             "HSK Ontras EXIT",
+             "Brandov STEGAL EXIT",
+             "Lanžhot EXIT",
+             "DCC EXIT ",
+             "TC (TSO) EXIT",
+             "Waidhaus - MEGAL 1",
+             "Waidhaus - MEGAL 2",
+             "Waidhaus - OGE",
+             "Dunajovice WITHDRAW",
+             "Horní Věstonice WITHDRAW",
+             "Háje WITHDRAW",
+             "Lobodice WITHDRAW",
+             "Štramberk WITHDRAW",
+             "Třanovice WITHDRAW",
+             "Tvrdonice WITHDRAW",
+             "Brumovice I. WITHDRAW",
+             "Brumovice II. WITHDRAW",
+             "Dunajovice INJECTION",
+             "Háje INJECTION",
+             "Lobodice INJECTION",
+             "Štramberk INJECTION",
+             "Třanovice INJECTION",
+             "Tvrdonice INJECTION",
+             "Brumovice I. INJECTION",
+             "Brumovice II. INJECTION",
+             "V. Němčice",
+             "Sviňomazy",
+             "Měcholupy",
+             "Bylany",
+             "Černá za Bory",
+             "Podolí",
+             "Dobříň",
+             "Děhylov",
+             "Lobodice SMP",
+             "Barchov",
+             "MS Bečov",
+             "Strážovice",
+             "Lodhéřov",
+             "Štolmíř",
+             "Makotřasy",
+             "Bukovany",
+             "Krupá",
+             "Dub",
+             "Pánov",
+             "Zvěstov",
+             "Bezměrov",
+             "Bartoušov",
+             "Lobodice JMP",
+             "PZP Štramberk MT1, MT2",
+             "Rybí",
+             "DSO zbytek"]
+       }
+}

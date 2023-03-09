@@ -1,0 +1,92 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Strucny opis:
+% Sablona, ktora bola pouzita pre pisanie
+% reportov a ostatneho textu.
+% Autor:
+% Michal Elias
+% (2021-04-21 Datum zalozenia) 
+% Verzie: 
+% 0.0.1. Beta verzia dokumentu. Zakladny text
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[
+12pt, % Main document font size
+a4paper, % Paper type, use 'letterpaper' for US Letter paper
+oneside, % One page layout (no page indentation)
+headinclude,footinclude, % Extra spacing for the header and footer
+chapterprefix=true,
+]{scrartcl}
+%{scrartcl}
+
+% nabalene usepackages a nejake zakladne makra su v zvlast subore
+\input{MAC/structure.tex} 
+
+% Nazov projektu 
+\title{\normalfont{libGeo: Opis súradnicových systémov a transformácie medzi vybranými systémami}}
+\author{\textsc{Michal Eliaš}}
+\date{}
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+%
+\renewcommand{\sectionmark}[1]{\markright{\spacedlowsmallcaps{#1}}} 
+\lehead{\mbox{\llap{\small\thepage\kern1em\color{halfgray} \vline}\color{halfgray}\hspace{0.5em}rightmark\hfil}}
+
+%\maketitle
+
+\setcounter{tocdepth}{2} 
+%
+%% Tabulka zmien dokumentu
+%\begin{table}[ht!]
+%\centering
+%\begin{tabular}{c|c|c|c}
+%\hline
+%Verze & Dátum & Autor & Opis zmìn \\
+%\hline
+%\hline
+%[0.1] & 2021-04-29 & mel & založení souboru. \\
+%\hline
+
+%\end{tabular}
+%\end{table}
+
+%\tableofcontents % Print the table of contents
+
+%\listoffigures % Print the list of figures
+
+%\listoftables % Print the list of tables
+
+%\section*{Abstrakt}
+%\textit{
+%Dokument obsahuje opis trasnformácií medzi vybranými súradnými systémami.
+%}
+
+\newpage 
+
+%--------------------------------------------
+%	Oznaceni. obsahuje zoznam najdolezitejsich oznaceni v texte
+%--------------------------------------------
+\include{CHAP/oznaceni}
+
+%--------------------------------------------
+%	Uvod. Co je cielom dokumentu
+%--------------------------------------------
+\include{CHAP/uvod}
+
+%--------------------------------------------
+%	Poznamky. Obsahuje napr. info o zavedenych vektoroch atp
+%--------------------------------------------
+\include{CHAP/poznamky}
+
+%--------------------------------------------
+%	Kapitola 3
+%--------------------------------------------
+\include{CHAP/ECEFvsENU}
+
+%--------------------------------------------
+%	Zoznam literatury
+%--------------------------------------------
+\bibliographystyle{apalike}
+\bibliography{MAC/zoznamLiteratury} 
+
+\end{document}

@@ -1,0 +1,49 @@
+\section{ECEF $\rightarrow$ ENU $\&$ ENU $\rightarrow$ ECEF}
+
+Predpokládajme, že v tomto príklade uvažovaný rotačný elipsoid (napríklad WGS-84 alebo GRS-80) je geocentrický, to znamená, že stred elipsoidu sa nachádza v strede zemského telesa, potom transformácia súradníc medzi zemským geocentrickým systémom súradníc (xyz) a lokálnym topocentrickým (alebo tiež lokálnym geodetickým - enu) môže byť vyjadrená predpisom \cite{Soler1998}
+
+\begin{equation}
+\begin{bmatrix}
+e \\
+n \\
+u
+\end{bmatrix} = 
+\mathbf{C}_{enu}^{xyz}
+\begin{bmatrix}
+x \\
+y \\
+z
+\end{bmatrix}.
+\label{rov:ecef2enu1}
+\end{equation}
+
+Pre vyjadrenie tranformácie medzi uvedenými systémami si potrebujeme vyjadriť transformačnú maticu, v tomto prípade tzv. rotačnú maticu. Vychádzajme z rovnice \ref{rov:generRotMat}, zostavíme rotačnú maticu pre rotáciu v priestore a to pomocou jednoduchých rotácii v každej osi samostatne.
+
+Rotačná matica okolo osi \textit{z} v smere hodinových ručičiek nadobúdne tvar
+\begin{equation}
+\mathbf{R_{1}}\left(\theta\right) = 
+\begin{bmatrix}
+\cos{\left(\theta\right)} & \sin{\left(\theta\right)} & 0 \\
+-\sin{\left(\theta\right)} & \cos{\left(\theta\right)} & 0 \\
+0 & 0 & 1
+\end{bmatrix},
+\end{equation}
+pričom rotácia okolo osi \textit{z} je $\cos{\left(\theta_{z,w}\right)} = 1$,
+
+% pretože uhol medzi osami \textit{z} a \textit{w} je rovný nule a cosínus nuly je rovný jedna. Ďalej platí, že kosínus uhla $\cos{\left(\theta_{z,u}\right)} = 0$, pretože uhol medzi osami \textit{z} a \textit{u} je rovný 90 stupňov a kosínus tohto uhla je teda nula. Rovnako tento predpoklad platí aj pre $\cos{\left(\theta_{z,v}\right)}$, $\cos{\left(\theta_{x,w}\right)}$ a $\cos{\left(\theta_{y,w}\right)}$.
+
+
+
+%
+%
+%Vyjadrenie transformačnej matice $\mathbf{C}_{enu}^{xyz}$ medzi dvoma pravouhlými karteziánskými súradnými systémami pozostáva z dvoch rotácii, konrkétne:
+%\begin{enumerate}
+%\item rotácie okolo osi \textit{z} o uhol $\pi/2 + \lambda$ a 
+%\item rotácie okolo osi \textit{y} o uhol $\pi/2 - \varphi$.
+%\end{enumerate}
+%
+%
+%Potom transformačná matica, v tomto prípade rotačná matica nadobudne tvaru
+%\begin{equation}
+%
+%\end{equation}

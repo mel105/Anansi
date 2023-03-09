@@ -1,0 +1,13 @@
+\babel@toc {czech}{}\relax 
+\contentsline {figure}{\numberline {1}{\ignorespaces Zobrazení bodu v ECEF soustavě souřadnic. Obrázek je převzat z \cite {ecefWiki}.}}{9}{figure.1}%
+\contentsline {figure}{\numberline {2}{\ignorespaces Zobrazení systému souřadnic East-North-Up. Obrázek je převzat z \cite {enuWiki}.}}{10}{figure.2}%
+\contentsline {figure}{\numberline {3}{\ignorespaces Geodetické zeměpisné souřadnice. Obrázek je převzat z \cite {Cimbalnik1997}.}}{10}{figure.3}%
+\contentsline {figure}{\numberline {4}{\ignorespaces Sférické polárni souřadnice. Obrázek je převzat z \cite {sphereWolf}.}}{11}{figure.4}%
+\contentsline {figure}{\numberline {5}{\ignorespaces Polární souřadnice. Obrázek je převzat z \cite {aesMatlab}.}}{12}{figure.5}%
+\contentsline {figure}{\numberline {6}{\ignorespaces $\varphi $ $\rightarrow $ $\left (x, y\right )$. Obrázek je převzat z \cite {Cimbalnik1997}.}}{16}{figure.6}%
+\contentsline {figure}{\numberline {7}{\ignorespaces Prostorové pravouhlé souřadnice. Obrázek je převzat z \cite {Cimbalnik1997}.}}{17}{figure.7}%
+\contentsline {figure}{\numberline {8}{\ignorespaces Geometrická azimutální projekce. Obrázek je převzat z \cite {Buchar2002}.}}{30}{figure.8}%
+\contentsline {figure}{\numberline {9}{\ignorespaces Zobrazenie elipsy chýb a Helmertovej krivky. Kovariancia je 0.0.}}{38}{figure.9}%
+\contentsline {figure}{\numberline {10}{\ignorespaces Zobrazenie elipsy chýb a Helmertovej krivky. Kovariancia je 1.5.}}{38}{figure.10}%
+\contentsline {figure}{\numberline {11}{\ignorespaces Transformácia suradníc zo súradného systému ECEF do systému ENU.}}{39}{figure.11}%
+\contentsline {figure}{\numberline {12}{\ignorespaces Obecná schéma možného převodu elipsoidicých souřadníc do systému zobrazovacích souřadníc.}}{42}{figure.12}%

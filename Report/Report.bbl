@@ -1,0 +1,123 @@
+\begin{thebibliography}{{Cim}97}
+
+\bibitem[{Bor}89]{Borkowski1989}
+K.~M. {Borkowski}.
+\newblock {Accurate algorithms to transform geocentric to geodetic
+  coordinates}.
+\newblock {\em Bulletin Geodesique}, 63(1):50--56, March 1989.
+
+\bibitem[Bow76]{Bowring1976}
+B.~Bowring.
+\newblock Transformation from spatial to geographical coordinates.
+\newblock {\em Survey Review}, 23:323--327, 1976.
+
+\bibitem[{Buc}02]{Buchar2002}
+{Buchar, P.}
+\newblock {\em Matematická kartografie}.
+\newblock Vydavatelství ČVUT, Praha, 2002.
+
+\bibitem[{Caj}14]{Cajthaml2014}
+{Cajthaml, J.}
+\newblock {\em Kartografie 1. Soubor přednášek.}
+\newblock ČVUT v Praze, katedra geomatiky, 2014.
+
+\bibitem[{Cim}97]{Cimbalnik1997}
+{Cimbalník M., Mervart L.}
+\newblock {\em Vyšší geodézie 1}.
+\newblock Ediční středisko ČVUT, Praha, 1997.
+
+\bibitem[{ECE}]{ecefWiki}
+{ECEF:Wiki}.
+\newblock Ecef coordinates in relation to latitude and longitude ---
+  {W}ikipedia{,} the free encyclopedia.
+
+\bibitem[{ENU}]{enuWiki}
+{ENU:Wiki}.
+\newblock The east north up (enu) local tangent plane is similar to ned, except
+  for swapping 'down' for 'up' and x for y. --- {W}ikipedia{,} the free
+  encyclopedia.
+
+\bibitem[FI03]{Fok2003}
+H.~Fok and H.~Iz.
+\newblock A comparative analysis of the performance of iterative and
+  non-iterative solutions to the cartesian to geodetic coordinate
+  transformation.
+\newblock volume~5, pages 61--74, 2003.
+
+\bibitem[{Fuk}06]{Fukushima2006}
+Toshio {Fukushima}.
+\newblock {Transformation from Cartesian to Geodetic Coordinates Accelerated by
+  Halley's Method}.
+\newblock {\em Journal of Geodesy}, 79(12):689--693, March 2006.
+
+\bibitem[GAB01]{Grewal2001}
+Mohinder~S. Grewal, Angus~P. Andrews, and Chris~G. Bartone.
+\newblock {\em Global Navigation Satellite Systems, Inertial Navigation, and
+  Integration}.
+\newblock Wiley-Interscience, 2001.
+
+\bibitem[Kov16]{Kovar2016}
+P.~Kovář.
+\newblock {\em Družicová navigace. Od teorie k aplikacím v softwarovém
+  přijímači.}
+\newblock České vysoké učení technické v Praze. Česká technika -
+  nakladatelství ČVUT, 2016.
+
+\bibitem[Kub13]{Kubacek2013}
+L.~Kubaček.
+\newblock {\em Statistical Theory of Geodetic Network}.
+\newblock VÚGTK, Zdiby, 2013.
+
+\bibitem[MA76]{Mikhail1976}
+E.M. Mikhail and F.E. Ackermann.
+\newblock {\em Observations and Least Squares}.
+\newblock IEP-A Dun-Donnelley Publisher, New York, 1976.
+
+\bibitem[{Mat}]{aesMatlab}
+{Matlab.}
+\newblock Comparison of 3-d coordinate systems.
+
+\bibitem[{Mer}]{webVUGTK}
+{Meridiánová konvergence}.
+\newblock Definice meridiánovej konvergence. terminologický slovník
+  zeměměřictví a katastru nemovitostí.
+
+\bibitem[Mey02]{Mayer2002}
+Thomas Meyer.
+\newblock Grid, ground, and globe: Distances in the gps era.
+\newblock {\em Surveying and Land Information Systems}, 62:179--202, 01 2002.
+
+\bibitem[SH88]{Soler1988}
+Tomas Soler and Larry Hothem.
+\newblock Coordinate systems used in geodesy: Basic definitions and concepts.
+\newblock {\em Journal of Surveying Engineering-asce - J SURV ENG-ASCE},
+  114:84--97, 05 1988.
+
+\bibitem[{Sny}87]{Snyder1987}
+{Snyder, J., P.}
+\newblock Map projections: A working manual, 1987.
+
+\bibitem[Sol98]{Soler1998}
+T.~Soler.
+\newblock A compendium of transformation formulas useful in gps work.
+\newblock {\em Journal of Geodesy}, 72:482--490, 1998.
+
+\bibitem[TDBS77]{Thomas1977}
+M.~P. Thomas D.~B., Mephan and R.~R. Steeves.
+\newblock The stereographic double projection, 1977.
+
+\bibitem[{Ver}11]{Vermeille2011}
+Hugues {Vermeille}.
+\newblock {An analytical method to transform geocentric into geodetic
+  coordinates}.
+\newblock {\em Journal of Geodesy}, 85(2):105--117, February 2011.
+
+\bibitem[{Wei}a]{sphereWolf}
+{Weisstein, E., W.}
+\newblock Spherical coordinates. from mathworld--a wolfram web resource.
+
+\bibitem[{Wei}b]{stereoWolf}
+{Weisstein, Eric W.}
+\newblock Stereographic projection. from mathworld. a wolfram web resource.
+
+\end{thebibliography}

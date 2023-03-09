@@ -1,0 +1,61 @@
+This is BibTeX, Version 0.99d (TeX Live 2022/dev/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: Report.aux
+A level-1 auxiliary file: Texty/ch_skratky.aux
+A level-1 auxiliary file: Texty/ch_symboly.aux
+A level-1 auxiliary file: Texty/ch_uvod.aux
+A level-1 auxiliary file: Texty/ch_poznamky.aux
+A level-1 auxiliary file: Texty/ch_transformacia.aux
+A level-1 auxiliary file: Texty/ch_zobrazenia.aux
+The style file: alpha.bst
+A level-1 auxiliary file: Texty/ch_prilohy.aux
+Database file #1: Texty/zoznamLiteratury.bib
+Warning--entry type for "Snyder1987" isn't style-file defined
+--line 131 of file Texty/zoznamLiteratury.bib
+Warning--entry type for "Thomas1977" isn't style-file defined
+--line 138 of file Texty/zoznamLiteratury.bib
+Warning--I didn't find a database entry for "Hampacher2003"
+Warning--empty booktitle in Fok2003
+Warning--can't use both volume and number fields in Fok2003
+You've used 23 entries,
+            2543 wiz_defined-function locations,
+            708 strings with 7736 characters,
+and the built_in function-call counts, 7080 in all, are:
+= -- 655
+> -- 245
+< -- 20
++ -- 74
+- -- 69
+* -- 414
+:= -- 1146
+add.period$ -- 61
+call.type$ -- 23
+change.case$ -- 114
+chr.to.int$ -- 22
+cite$ -- 25
+duplicate$ -- 324
+empty$ -- 617
+format.name$ -- 110
+if$ -- 1465
+int.to.chr$ -- 2
+int.to.str$ -- 0
+missing$ -- 22
+newline$ -- 110
+num.names$ -- 69
+pop$ -- 178
+preamble$ -- 1
+purify$ -- 144
+quote$ -- 0
+skip$ -- 271
+stack$ -- 0
+substring$ -- 320
+swap$ -- 32
+text.length$ -- 20
+text.prefix$ -- 18
+top$ -- 0
+type$ -- 156
+warning$ -- 2
+while$ -- 60
+width$ -- 27
+write$ -- 264
+(There were 5 warnings)
