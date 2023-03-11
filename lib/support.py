@@ -78,7 +78,7 @@ def calcWeights(unt, df):
 
     """
 
-    if unt:
+    if unt():
 
         wVec = np.sqrt(abs(df.Offtakes-df.Intakes))
     else:

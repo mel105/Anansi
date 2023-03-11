@@ -27,7 +27,7 @@ import lib.processModel as prc
 import lib.smoothSeries as smt
 import lib.plotter as mplt
 import lib.metrics as mt
-# import lib.ufg as ufg
+import lib.processUfg as ufg
 
 
 def run():
@@ -39,6 +39,10 @@ def run():
     # Spracovanie modelu. Polozka 0 v hore preddefinovanom zozname uloh.
     modelObj = prc.processModel(confObj)
 
+    # Metriky nevyhladenych dat
+    mt.metrics(modelObj.getRealUfG(), modelObj.getModel())
+
+    """
     # vyhladenie realnych ufg dat a spocitanie relativnych ufg
     realSmtObj = smt.smoothSeries(modelObj.getRealUfG(), confObj.getSmoothingMethod(),
                                   confObj.getSmoothingBin(), confObj)
@@ -46,20 +50,45 @@ def run():
     # Vyhladenie rady modelu pat dnovym priemerom a spocitanie relativnych UfG
     calcSmtObj = smt.smoothSeries(modelObj.getModel(), confObj.getSmoothingMethod(),
                                   confObj.getSmoothingBin(), confObj)
-    # Metriky nevyhladenych dat
-    mt.metrics(modelObj.getRealUfG(), modelObj.getModel())
-
+    
     # Porovnanie vyhladenych casovych radov
     mplt.plotResults(modelObj.getTimeVec(), realSmtObj.getSmtSeries()[1:],
                      calcSmtObj.getSmtSeries()[1:])
     mplt.plotDetails(modelObj.getTimeVec(), np.array(realSmtObj.getSmtSeries()[1:]),
                      np.array(calcSmtObj.getSmtSeries()[1:]), confObj.getDBeg(), confObj.getDEnd())
 
-    # Metriky evyhladenych dat
+    # Metriky vyhladenych dat
     mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
 
+    ###################################################################################################
     # Spocitanie relativnych strat
-    # ufgObj = ufg.processUfg(confObj, modelObj)
+    ufgObj = ufg.processUfg(modelObj)
+
+    # Metriky nevyhladenych dat
+    mt.metrics(ufgObj.getRealUfG(), ufgObj.getCalcUfG())
+
+    # Porovnanie vyhladenych casovych radov
+    mplt.plotResults(modelObj.getTimeVec(), ufgObj.getRealUfG(), ufgObj.getCalcUfG())
+    mplt.plotDetails(modelObj.getTimeVec(), np.array(ufgObj.getRealUfG()),
+                     np.array(ufgObj.getCalcUfG()), confObj.getDBeg(), confObj.getDEnd())
+
+    # vyhladenie realnych ufg dat a spocitanie relativnych ufg
+    realRelSmtObj = smt.smoothSeries(ufgObj.getRealUfG(), confObj.getSmoothingMethod(),
+                                     confObj.getSmoothingBin(), confObj)
+
+    # Vyhladenie rady modelu pat dnovym priemerom a spocitanie relativnych UfG
+    calcRelSmtObj = smt.smoothSeries(ufgObj.getCalcUfG(), confObj.getSmoothingMethod(),
+                                     confObj.getSmoothingBin(), confObj)
+
+    # Porovnanie vyhladenych casovych radov
+    mplt.plotResults(modelObj.getTimeVec(), realRelSmtObj.getSmtSeries()[1:],
+                     calcRelSmtObj.getSmtSeries()[1:])
+    mplt.plotDetails(modelObj.getTimeVec(), np.array(realRelSmtObj.getSmtSeries()[1:]),
+                     np.array(calcRelSmtObj.getSmtSeries()[1:]), confObj.getDBeg(), confObj.getDEnd())
+
+    # Metriky vyhladenych dat
+    mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
+    """
 
 
 # Spustenie spracovania dat

@@ -107,7 +107,7 @@ class processModel:
 
         """
 
-        return self._df["INTAKES"]
+        return self._df["Intakes"].to_numpy()
 
     def getTimeVec(self):
         """
