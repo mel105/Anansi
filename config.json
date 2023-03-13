@@ -24,9 +24,14 @@
                 "smoothingBin":5,
                 "smoothingAlt": "center"
     },
+    "setDescriptive":{
+                  "stations": [
+                  "All"],
+                  "verbosity": 1
+    },
     "setStations":{
             "stations": [
              "Age",
              "Weight"]
-       }
+    }
 }

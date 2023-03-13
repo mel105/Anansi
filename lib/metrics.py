@@ -67,6 +67,6 @@ def metrics(lVec, eVec):
     # Histogram rozdielov
     print("\n\n         HISTOGRAM:      ")
     print("-----------------------------")
-    plot.plotHistogram(res)
+    # plot.plotHistogram(res)
     print("OK")
     return 0

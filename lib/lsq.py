@@ -9,12 +9,15 @@ Skript len spracuje vybrane data a autor si osaha numpy, maticovu algebru a LSQ
 """
 
 import numpy as np
-import lib.plotter as plot
+# import lib.plotter as plot
 import lib.support as msupp
+import statistics as st
+from tabulate import tabulate
 
 
 # import matplotlib.pyplot as plt
 # import pandas as pd
+
 
 def processLSQ(data, lVec, W, presFitStat, listOfStations, confObj):
     """
@@ -139,7 +142,7 @@ def summary(lVec, eVec, stations, A, dh, Qvv, N, coef, probup):
     print(f"Degree of freedom:     {len(lVec) - len(dh) - 1}")
 
     # vektor oprav
-    v = np.matmul(A, dh) - lVec
+    v = np.matmul(A, dh) - (lVec-eVec.reshape((-1, 1)))
     print(f"\n\nSuma oprav je {sum(v[0]): .2f}")
 
     # jednotkova stredna chyba m0
@@ -157,6 +160,9 @@ def summary(lVec, eVec, stations, A, dh, Qvv, N, coef, probup):
     initCoef = coef.ravel()
     mC = mC.ravel()
 
+    # Standardized coefficients
+    std = standardCoef(coef, lVec,  A)
+
     # intervaly spolahlivosti
     islow = initCoef - 1.960*mC
     isup = initCoef + 1.960*mC
@@ -173,10 +179,34 @@ def summary(lVec, eVec, stations, A, dh, Qvv, N, coef, probup):
 
     print("\nOdhad koeficientov:\n")
     print(f"Kriticka hodnota t-statistiky {tcrit: .2f}")
+    # priprava tabulky na tlac
+    table = []
     for i in range(len(initCoef)):
-        print(
-            f" Odhady [{i}]: {initCoef[i]: .5f}  {mC[i]: .5f}  {islow[i]: .5f}  {isup[i]: .5f}\
-    {tstat[i]:.5f}  {pval[i]:.5f} -->> {stations[i-1]}")
+        row = [stations[i], initCoef[i], std[i], mC[i], tstat[i], pval[i], islow[i], isup[i]]
+        table.append(row)
+
+    print(tabulate(table,
+                   headers=["Station", "Coef", "Standardized Coef", "Standard Deviation",
+                            "t-stat", "p-val", "Lower Bound", "Upper Bound"],
+                   tablefmt="outline"))
+    # print(
+    #    f" Odhady [{i}]: {initCoef[i]: .5f}  {mC[i]: .5f}  {islow[i]: .5f}  {isup[i]: .5f}\
+    # {tstat[i]:.5f}  {pval[i]:.5f} -->> {stations[i-1]}")
+
+
+def standardCoef(coef, lVec, A):
+    """
+    Funkcia vrati odhad standardizovanych koeficientov. Mali by byt v intervale od -1, 1 a poukazuju
+    na fakt, ktory z regresorov ma vacsi efekt na celkovu regresiu.
+    """
+
+    y = st.stdev([y for x in lVec for y in x])
+    std = []
+    a, b = A.shape
+    for i in range(b):
+        std.append(coef[i]*(st.stdev(A[:, i])/y))
+
+    return std
 
 
 def getPValues(tstats, N):
@@ -337,10 +367,10 @@ def model(coef, inp, inter):
     if inter:
         # MELTODO: Model obsahuje aj abs. clen. No zatial nefunguje dobre
         for i in range(len(inp)):
-            tmp = coef[0]
+            tmp = float(coef[0])
             for j in range(len(coef)-1):
-                # print(" f.2%   f.2%", i, j)
-                tmp += coef[j+1]*float(inp[i, j])
+                # print(i, j, tmp, coef[0])
+                tmp += float(coef[j+1])*float(inp[i, j])
 
             val.append(tmp)
     else:

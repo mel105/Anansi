@@ -227,6 +227,32 @@ class config:
         """
         return self._smoothingAlt
 
+    def getVerbosity(self):
+        """
+        Funkcia vrati hodnotu verbosity pre popisnu statistiku. 0 znamena, ze sa nema nic zobrazovat.
+        1 znamena, ze zobrazim vysledky vo vne triedy vo forme tabulky
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        """
+        return self._descVerbosity
+
+    def getDescStations(self):
+        """
+        Funkcia vrati zoznam stanic, ktore by som chcel statisticky opisat. Bud zadam All a to znamena,
+        ze postupne spracujem vsetky stanice, ktore sa nachadzaju
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        """
+        return self._descStations
+
     ###################################################################################################
     # protected funkcie
 
@@ -267,3 +293,7 @@ class config:
         self._smoothingMethod = cf["setSmoothing"]["smoothingMethod"]
         self._smoothingBin = cf["setSmoothing"]["smoothingBin"]
         self._smoothingAlt = cf["setSmoothing"]["smoothingAlt"]
+
+        # nacitanie nastavenia tykajuce sa vyberu stanice, ktoru chcem statisticky opisat.
+        self._descStations = cf["setDescriptive"]["stations"]
+        self._descVerbosity = cf["setDescriptive"]["verbosity"]

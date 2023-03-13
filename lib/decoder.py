@@ -9,30 +9,43 @@ Created on Fri Feb 10 17:02:49 2023
 import pandas as pd
 
 
-def decoder(fileName, filePath, confObj):
-    """
+class decoder:
 
+    def __init__(self, fileName, filePath, confObj):
+        """
 
-    Parameters
-    ----------
-    fileName : TYPE
-        DESCRIPTION.
-    filePath : TYPE
-        DESCRIPTION.
-    confObj : TYPE
-        DESCRIPTION.
+        Parameters
+        ----------
+        fileName : TYPE
+            DESCRIPTION.
+            filePath : TYPE
+            DESCRIPTION.
+            confObj : TYPE
+            DESCRIPTION.
 
-    Returns
-    -------
-    df : TYPE
-        DESCRIPTION.
+            Returns
+            -------
+            df : TYPE
+            DESCRIPTION.
 
-    """
+            """
 
-    df = pd.read_excel(filePath+"/"+fileName[0]+".xlsx")
-    df.rename(columns={df.columns[0]: "DATE"}, inplace=True)
+        self._df = pd.read_excel(filePath+"/"+fileName[0]+".xlsx")
+        self._df.rename(columns={self._df.columns[0]: "DATE"}, inplace=True)
 
-    # Filtrovanie dat podla zadanych limitnych datumov
-    df = df[(df['DATE'] >= confObj.getBeg()) & (df['DATE'] <= confObj.getEnd())]
+        # Filtrovanie dat podla zadanych limitnych datumov
+        self._df = self._df[(self._df['DATE'] >= confObj.getBeg()) &
+                            (self._df['DATE'] <= confObj.getEnd())]
 
-    return df
+    def getDF(self):
+        """
+        Funkcia vrati naplneny kontajner formatu Dataframe
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        """
+
+        return self._df

@@ -28,16 +28,25 @@ import lib.smoothSeries as smt
 import lib.plotter as mplt
 import lib.metrics as mt
 import lib.processUfg as ufg
+import lib.decoder as dc
+import lib.descriptive as ds
 
 
 def run():
     # Nacitanie koniguracneho suboru
     confObj = cfg.config()
 
+    # Nacitanie dat
+    fileName = confObj.getInpFileName()
+    filePath = confObj.getInpFilePath()
+    decObj = dc.decoder(fileName, filePath, confObj)
+
     # Analyza kazdej jednej nezavislej premennej, kazdej jednej rady, ktora vstupuje do modelu
+    # 1. Statisticky opis rady
+    ds.descriptive(confObj, decObj)
 
     # Spracovanie modelu. Polozka 0 v hore preddefinovanom zozname uloh.
-    modelObj = prc.processModel(confObj)
+    modelObj = prc.processModel(confObj, decObj)
 
     # Metriky nevyhladenych dat
     mt.metrics(modelObj.getRealUfG(), modelObj.getModel())

@@ -22,7 +22,7 @@ class processModel:
         3. sumarizovat kvalitu spracovania (model summary: okrem statistik, histogram reziduii, R2 atp)
     """
 
-    def __init__(self, confObj):
+    def __init__(self, confObj, decObj):
         """
         Konstruktor tiedy processModel
 
@@ -43,7 +43,8 @@ class processModel:
         self._listOfStations = self._conf.getOutStations()
 
         # Nacitanie excelovskej tabulky
-        self._df = dec.decoder(self._conf.getInpFileName(), self._conf.getInpFilePath(), self._conf)
+        self._df = decObj.getDF()
+        # self._df = dec.decoder(self._conf.getInpFileName(), self._conf.getInpFilePath(), self._conf)
 
         # Spracovanie vybranych dat a ich ulozenie do pola data
         self._data = msupp.fillDataContainer(self._df, self._listOfStations)
@@ -159,6 +160,9 @@ class processModel:
             self._data = dataOut
             coef = coefOut
             self._listOfStations = listOfStationsOut
+
+            if self._conf.getAddIntercept():
+                self._listOfStations.insert(0, "Constant")
 
         # Celkove calc UfG
         self._valEst = valEst
