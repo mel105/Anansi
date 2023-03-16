@@ -227,7 +227,7 @@ class config:
         """
         return self._smoothingAlt
 
-    def getVerbosity(self):
+    def getDescVerbosity(self):
         """
         Funkcia vrati hodnotu verbosity pre popisnu statistiku. 0 znamena, ze sa nema nic zobrazovat.
         1 znamena, ze zobrazim vysledky vo vne triedy vo forme tabulky

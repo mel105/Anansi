@@ -62,7 +62,7 @@ def metrics(lVec, eVec):
 #    print(f"D: {CD[0]:0.3f}")
 
     # Scatter graf
-    plot.plotScatter(lVec, eVec)
+    # plot.plotScatter(lVec, eVec)
 
     # Histogram rozdielov
     print("\n\n         HISTOGRAM:      ")

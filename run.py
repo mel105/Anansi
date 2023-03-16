@@ -30,6 +30,7 @@ import lib.metrics as mt
 import lib.processUfg as ufg
 import lib.decoder as dc
 import lib.descriptive as ds
+import lib.charts as cha
 
 
 def run():
@@ -48,8 +49,30 @@ def run():
     # Spracovanie modelu. Polozka 0 v hore preddefinovanom zozname uloh.
     modelObj = prc.processModel(confObj, decObj)
 
+    # Zobrazenie spracovania dat v linecharte
+    cha.lineChart(decObj.getDF()["DATE"], decObj.getDF()["TOTAL NB"], title="Ladenie line chartu",
+                  xLabel="Datum", yLabel="Sledovany parameter")
+
+    cha.multilineChart(decObj.getDF(), title="Ladenie line chartu", xLabel="Datum",
+                       yLabel="Sledovany parameter")
+
+    # Box plot
+    cha.boxChart(decObj.getDF()["TOTAL NB"], title="TOTAL NB", boxp="suspectedoutliers")
+
+    # QQ plot
+    cha.qqChart(decObj.getDF()["TOTAL NB"], "Ladenie QQ plotu a zistovanie normality")
+
+    # Scatter diagram matrix
+    cha.scatterMatrix(decObj.getDF())
+
+    # Heatmat plot zobrazujuci korelacnu maticu
+    cha.heatmapDiagram(decObj.getDF())
+
+    # Histogram> Nefunguje dobre.
+    # cha.histChart(decObj.getDF()["TOTAL NB"], "Ladenie Histogramu")
+
     # Metriky nevyhladenych dat
-    mt.metrics(modelObj.getRealUfG(), modelObj.getModel())
+    # mt.metrics(modelObj.getRealUfG(), modelObj.getModel())
 
     """
     # vyhladenie realnych ufg dat a spocitanie relativnych ufg

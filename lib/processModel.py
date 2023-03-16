@@ -66,11 +66,11 @@ class processModel:
 
         # obrazky
         # Vykreslenie rozdielu vstupneho toku plynu a vystupneho toku plynu
-        mplt.plotResults(self._df["DATE"], self._lVec, self._valEst)
+        # mplt.plotResults(self._df["DATE"], self._lVec, self._valEst)
 
         # Zobrazenie detailu
-        mplt.plotDetails(self._df["DATE"], self._lVec, self._valEst, self._conf.getDBeg(),
-                         self._conf.getDEnd())
+        # mplt.plotDetails(self._df["DATE"], self._lVec, self._valEst, self._conf.getDBeg(),
+        #                  self._conf.getDEnd())
 
     # GET FUNKCIE
     def getModel(self):

@@ -9,6 +9,7 @@ Created on Sun Mar 12 21:20:00 2023
 from tabulate import tabulate
 import numpy as np
 import scipy.stats as sc
+from tabulate import tabulate
 
 
 class descriptive:
@@ -28,7 +29,7 @@ class descriptive:
         """
 
         self._stations = confObj.getDescStations()
-        self._verb = confObj.getVerbosity()
+        self._verb = confObj.getDescVerbosity()
 
         self._df = decObj.getDF()
 
@@ -39,11 +40,28 @@ class descriptive:
         # ak je zoznam stations =  All, potom prechadzam cez cely df, inak cez stations
         if self._stations[0] == "All":
             _, b = self._df.shape
+
+            # slovnik, do ktoreho nastrkame statistiky  za kazdu sledovanu velicinu
+            self._mdict = {}
+
             for i in range(1, b):
                 stat = self._df.columns[i]
                 vec = self._df[stat].to_numpy()
 
                 res = self._statistics(vec, self._verb)
+
+                # zoradena tabulka odhadnutych statistik
+                tab = [["Mean", res[0]], ["Variance", res[1]], ["Sum", res[2]], ["Min", res[3]],
+                       ["Q25", res[4]], ["Median", res[5]], ["Q75", res[6]], ["Max", res[7]],
+                       ["Range", res[8]], ["Skewness", res[9]], ["Kurtosis", res[10]]]
+
+                # naplnenie slovnika
+                self._mdict[stat] = tab
+
+                # pokial povolim, tak tabulka sa vypise na plochu
+                if self._verb:
+                    print("\n", "      ", stat, "\n", tabulate(
+                        tab, headers=["Variable", "Estimation"]))
 
     def _statistics(self, vec, verb=0):
         """
@@ -65,8 +83,7 @@ class descriptive:
 
         # mean
         mean = np.mean(vec)
-        res.append(mean
-                   )
+        res.append(mean)
         # standard deviation
         # sdev = np.st(vec)
         # res.append(sdev)
@@ -80,7 +97,7 @@ class descriptive:
         res.append(suma)
 
         # modal
-        #mod = np.mod(vec)
+        # mod = np.mod(vec)
         # res.append(mod)
 
         # min
@@ -116,7 +133,5 @@ class descriptive:
         # kurtosis
         kurt = sc.kurtosis(vec, axis=0, bias=True)
         res.append(kurt)
-
-        print(res)
 
         return res
