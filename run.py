@@ -21,12 +21,13 @@ Postupne by tento skript ma zastresit tieto ukony:
 
 
 # import lib.plotitko as mplt
-import numpy as np
+# import numpy as np
+import pandas as pd
 import lib.config as cfg
 import lib.processModel as prc
 import lib.smoothSeries as smt
-import lib.plotter as mplt
-import lib.metrics as mt
+# import lib.plotter as mplt
+# import lib.metrics as mt
 import lib.processUfg as ufg
 import lib.decoder as dc
 import lib.descriptive as ds
@@ -50,23 +51,24 @@ def run():
     modelObj = prc.processModel(confObj, decObj)
 
     # Zobrazenie spracovania dat v linecharte
-    cha.lineChart(decObj.getDF()["DATE"], decObj.getDF()["TOTAL NB"], title="Ladenie line chartu",
-                  xLabel="Datum", yLabel="Sledovany parameter")
+    # cha.lineChart(decObj.getDF()["DATE"], decObj.getDF()["TOTAL NB"], title="Ladenie line chartu",
+    #               xLabel="Datum", yLabel="Sledovany parameter")
 
-    cha.multilineChart(decObj.getDF(), title="Ladenie line chartu", xLabel="Datum",
-                       yLabel="Sledovany parameter")
+    # cha.multilineChart(decObj.getDF(), title="Ladenie line chartu", xLabel="Datum",
+    #                    yLabel="Sledovany parameter")
 
     # Box plot
-    cha.boxChart(decObj.getDF()["TOTAL NB"], title="TOTAL NB", boxp="suspectedoutliers")
+    # cha.boxChart(decObj.getDF()["TOTAL NB"], title="TOTAL NB", boxp="suspectedoutliers")
 
     # QQ plot
-    cha.qqChart(decObj.getDF()["TOTAL NB"], "Ladenie QQ plotu a zistovanie normality")
+    # cha.qqChart(decObj.getDF()["TOTAL NB"], "Ladenie QQ plotu a zistovanie normality")
 
-    # Scatter diagram matrix
-    cha.scatterMatrix(decObj.getDF())
+    # Scatter diagram matrix. Pre velke data, musim osetrit jednotlive bunky, aby sa tam vyskytovali len
+    # numericke cisla. To same pre heatmatrix
+    # cha.scatterMatrix(decObj.getDFred())
 
     # Heatmat plot zobrazujuci korelacnu maticu
-    cha.heatmapDiagram(decObj.getDF())
+    fo1, fo2 = cha.heatmapDiagram(decObj.getDFred())
 
     # Histogram> Nefunguje dobre.
     # cha.histChart(decObj.getDF()["TOTAL NB"], "Ladenie Histogramu")
@@ -74,7 +76,6 @@ def run():
     # Metriky nevyhladenych dat
     # mt.metrics(modelObj.getRealUfG(), modelObj.getModel())
 
-    """
     # vyhladenie realnych ufg dat a spocitanie relativnych ufg
     realSmtObj = smt.smoothSeries(modelObj.getRealUfG(), confObj.getSmoothingMethod(),
                                   confObj.getSmoothingBin(), confObj)
@@ -82,27 +83,34 @@ def run():
     # Vyhladenie rady modelu pat dnovym priemerom a spocitanie relativnych UfG
     calcSmtObj = smt.smoothSeries(modelObj.getModel(), confObj.getSmoothingMethod(),
                                   confObj.getSmoothingBin(), confObj)
-    
+
     # Porovnanie vyhladenych casovych radov
-    mplt.plotResults(modelObj.getTimeVec(), realSmtObj.getSmtSeries()[1:],
-                     calcSmtObj.getSmtSeries()[1:])
-    mplt.plotDetails(modelObj.getTimeVec(), np.array(realSmtObj.getSmtSeries()[1:]),
-                     np.array(calcSmtObj.getSmtSeries()[1:]), confObj.getDBeg(), confObj.getDEnd())
+    cha.multilineChart(pd.DataFrame({"DATE": modelObj.getTimeVec(),
+                                     "real": realSmtObj.getSmtSeries()[1:],
+                                     "calc": calcSmtObj.getSmtSeries()[1:]}),
+                       title="Porovnanie vyhladenych realnych a modelovanych strat",
+                       xLabel="DATE", yLabel="Straty [kWh]")
 
     # Metriky vyhladenych dat
-    mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
+    # mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
 
     ###################################################################################################
     # Spocitanie relativnych strat
     ufgObj = ufg.processUfg(modelObj)
 
-    # Metriky nevyhladenych dat
-    mt.metrics(ufgObj.getRealUfG(), ufgObj.getCalcUfG())
+    # Porovnanie realtivnych [%] casovych radov
+    r = ufgObj.getRealUfG()
+    c = ufgObj.getCalcUfG()
+    real = [float(r) for r in r]
+    calc = [float(c) for c in c]
+    cha.multilineChart(pd.DataFrame({"DATE": modelObj.getTimeVec(),
+                                     "real": real,
+                                     "calc": calc}),
+                       title="Porovnanie relativnych realnych a modelovanych strat",
+                       xLabel="DATE", yLabel="Straty [%/100]")
 
-    # Porovnanie vyhladenych casovych radov
-    mplt.plotResults(modelObj.getTimeVec(), ufgObj.getRealUfG(), ufgObj.getCalcUfG())
-    mplt.plotDetails(modelObj.getTimeVec(), np.array(ufgObj.getRealUfG()),
-                     np.array(ufgObj.getCalcUfG()), confObj.getDBeg(), confObj.getDEnd())
+    # Metriky
+    # mt.metrics(ufgObj.getRealUfG(), ufgObj.getCalcUfG())
 
     # vyhladenie realnych ufg dat a spocitanie relativnych ufg
     realRelSmtObj = smt.smoothSeries(ufgObj.getRealUfG(), confObj.getSmoothingMethod(),
@@ -113,14 +121,14 @@ def run():
                                      confObj.getSmoothingBin(), confObj)
 
     # Porovnanie vyhladenych casovych radov
-    mplt.plotResults(modelObj.getTimeVec(), realRelSmtObj.getSmtSeries()[1:],
-                     calcRelSmtObj.getSmtSeries()[1:])
-    mplt.plotDetails(modelObj.getTimeVec(), np.array(realRelSmtObj.getSmtSeries()[1:]),
-                     np.array(calcRelSmtObj.getSmtSeries()[1:]), confObj.getDBeg(), confObj.getDEnd())
+    cha.multilineChart(pd.DataFrame({"DATE": modelObj.getTimeVec(),
+                                     "real": realRelSmtObj.getSmtSeries()[1:],
+                                     "calc": calcRelSmtObj.getSmtSeries()[1:]}),
+                       title="Porovnanie vyhladenych relativnych realnych a modelovanych strat",
+                       xLabel="DATE", yLabel="Straty [%/100]")
 
     # Metriky vyhladenych dat
-    mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
-    """
+    # mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
 
 
 # Spustenie spracovania dat

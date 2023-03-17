@@ -143,11 +143,11 @@ def summary(lVec, eVec, stations, A, dh, Qvv, N, coef, probup):
 
     # vektor oprav
     v = np.matmul(A, dh) - (lVec-eVec.reshape((-1, 1)))
-    print(f"\n\nSuma oprav je {sum(v[0]): .2f}")
+    print(f"\n\nSuma oprav je {float(sum(v)): .2f}")
 
     # jednotkova stredna chyba m0
     m0 = np.sqrt(np.matmul(np.transpose(v), v) / (len(v) - len(dh)))
-    print(f"Jednotkova stredna chyba je {m0[0][0]: .2f}")
+    print(f"Jednotkova stredna chyba je {float(m0): .2f}")
 
     # stredne chyby neznamych parametrov
     mC = m0 * np.sqrt(np.diag(Qvv))

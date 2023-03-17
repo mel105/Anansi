@@ -19,7 +19,7 @@ class processUfg:
     def __init__(self, modelObj):
 
         self._relRealUfG = modelObj.getRealUfG() / modelObj.getIntakes().reshape((-1, 1))
-        self._relCalcUfG = modelObj.getModel() / modelObj.getIntakes().reshape((-1, 1))
+        self._relCalcUfG = modelObj.getModel().reshape((-1, 1)) / modelObj.getIntakes().reshape((-1, 1))
 
     def getRealUfG(self):
         """

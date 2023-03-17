@@ -9,20 +9,22 @@ Created on Wed Mar 15 19:43:10 2023
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.stats import norm
+
+
+# from scipy.stats import norm
 import plotly.figure_factory as ff
-from scipy import stats
+# from scipy import stats
 from statsmodels.graphics.gofplots import qqplot
 import plotly.io as pio
 import plotly.graph_objects as go
 import matplotlib
-matplotlib.use('WebAgg')
-pio.renderers.default = 'browser'
+matplotlib.use("WebAgg")
+pio.renderers.default = "browser"
 
 
 def heatmapDiagram(df):
     """
-    Funkcia vrati tzv. heatmap, ktora zobrazuje vysledok korelacnej matice, cize zobrazuje zavislosti medzi 
+    Funkcia vrati tzv. heatmap, ktora zobrazuje vysledok korelacnej matice, cize zobrazuje zavislosti medzi
     parametrami
 
     Parameters
@@ -40,24 +42,42 @@ def heatmapDiagram(df):
     corrmat = df.drop(columns="DATE").corr()
 
     # #1
-    fig1 = plt.figure(figsize=(16, 6))
+    fig1 = plt.figure(figsize=(50, 40))
     # define the mask to set the values in the upper triangle to True
     mask = np.triu(np.ones_like(corrmat, dtype=np.bool))
     heatmap = sns.heatmap(corrmat, mask=mask, vmin=-1, vmax=1, annot=True, cmap='BrBG')
 
-    heatmap.set_title('Triangle Correlation Heatmap', fontdict={'fontsize': 18}, pad=16)
+    heatmap.set_title('Triangle Correlation Heatmap', fontdict={'fontsize': 35}, pad=10)
+
+    plt.savefig('my_plot_a.png')
 
     # #2
-    fig2 = plt.figure(figsize=(8, 12))
+    fig2 = plt.figure(figsize=(25, 35))
     heatmap = sns.heatmap(corrmat[['TOTAL NB']].sort_values(by='TOTAL NB', ascending=False), vmin=-1, vmax=1,
                           annot=True, cmap='BrBG')
-    heatmap.set_title('Features Correlating with Sales Price', fontdict={'fontsize': 18}, pad=16)
+    heatmap.set_title('Features Correlating with Sales Price', fontdict={'fontsize': 35}, pad=10)
+
+    plt.savefig('my_plot_2.png')
     # fig = go.Figure(data=go.Heatmap(corrmat, hoverongaps=False))
 
+    """
+    print('<HTML><HEAD><TITLE>Python Matplotlib Graph</TITLE></HEAD>')
+    print('<BODY>')
+    print('<CENTER>')
+    print('<br><br>')
+    print('<H3>Graph</H3>')
+    print(mpld3.fig_to_html(fig1, d3_url=None, mpld3_url=None, no_extras=False, template_type='general',
+                            figid=None, use_http=False))
+    print('<br>')
+
+    print('</CENTER>')
+    print('</BODY>')
+    print('</html>')
+    """
     fig1.show()
     fig2.show()
 
-    return
+    return fig1, fig2
 
 
 def scatterMatrix(df):
@@ -139,9 +159,9 @@ def histChart(res, title):
     hist_data = [x]
     group_labels = ['distplot']  # name of the dataset
 
-    mean = np.mean(x)
-    stdev_pluss = np.std(x)
-    stdev_minus = np.std(x)*-1
+    # mean = np.mean(x)
+    # stdev_pluss = np.std(x)
+    # stdev_minus = np.std(x)*-1
 
     fig = ff.create_distplot(hist_data, group_labels, curve_type='kde')
     fig.update_layout(template='plotly_dark')
@@ -152,7 +172,6 @@ def histChart(res, title):
 
     fig.add_traces(go.Scatter(x=normal_x, y=normal_y, mode='lines',
                               line=dict(color='rgba(0,255,0, 0.6)',
-                                        #dash = 'dash'
                                         width=1),
                               name='normal'
                               ))
