@@ -68,7 +68,7 @@ def run():
     # cha.scatterMatrix(decObj.getDFred())
 
     # Heatmat plot zobrazujuci korelacnu maticu
-    fo1, fo2 = cha.heatmapDiagram(decObj.getDFred())
+    # fo1, fo2 = cha.heatmapDiagram(decObj.getDFred())
 
     # Histogram> Nefunguje dobre.
     # cha.histChart(decObj.getDF()["TOTAL NB"], "Ladenie Histogramu")

@@ -7,6 +7,7 @@ Created on Fri Feb 10 17:02:49 2023
 """
 
 import pandas as pd
+import numpy as np
 
 
 class decoder:
@@ -32,7 +33,19 @@ class decoder:
 
         self._df = pd.read_excel(filePath+"/"+fileName[0]+".xlsx", verbose=True)
         self._df.rename(columns={self._df.columns[0]: "DATE"}, inplace=True)
+
+        # uprava policka v dataframe, ak neobsahuje ziadnu hodnotu
+        # datafram plny true of false
+        boo = self._df.applymap(np.isreal)
+        # konvert boo do pola array
+        boa = boo.to_numpy()
+        # indexy/suradnice kde v boo najdem false
+        ri, ci = np.where(~boa)
+        for i in range(len(ri)):
+            self._df.loc[ri[i], self._df.columns[ci[i]]] = 0.0
+
         self._dfred = self._df
+
         # definovanie si stlpcov, ktore nie su numerickeho typu
         for i in self._dfred.columns:
             j = pd.to_numeric(self._dfred[i], errors='coerce').notnull().all()
