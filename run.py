@@ -27,7 +27,7 @@ import lib.config as cfg
 import lib.processModel as prc
 import lib.smoothSeries as smt
 # import lib.plotter as mplt
-# import lib.metrics as mt
+import lib.metrics as mt
 import lib.processUfg as ufg
 import lib.decoder as dc
 import lib.descriptive as ds
@@ -50,32 +50,6 @@ def run():
     # Spracovanie modelu. Polozka 0 v hore preddefinovanom zozname uloh.
     modelObj = prc.processModel(confObj, decObj)
 
-    # Zobrazenie spracovania dat v linecharte
-    # cha.lineChart(decObj.getDF()["DATE"], decObj.getDF()["TOTAL NB"], title="Ladenie line chartu",
-    #               xLabel="Datum", yLabel="Sledovany parameter")
-
-    # cha.multilineChart(decObj.getDF(), title="Ladenie line chartu", xLabel="Datum",
-    #                    yLabel="Sledovany parameter")
-
-    # Box plot
-    # cha.boxChart(decObj.getDF()["TOTAL NB"], title="TOTAL NB", boxp="suspectedoutliers")
-
-    # QQ plot
-    # cha.qqChart(decObj.getDF()["TOTAL NB"], "Ladenie QQ plotu a zistovanie normality")
-
-    # Scatter diagram matrix. Pre velke data, musim osetrit jednotlive bunky, aby sa tam vyskytovali len
-    # numericke cisla. To same pre heatmatrix
-    # cha.scatterMatrix(decObj.getDFred())
-
-    # Heatmat plot zobrazujuci korelacnu maticu
-    # fo1, fo2 = cha.heatmapDiagram(decObj.getDFred())
-
-    # Histogram> Nefunguje dobre.
-    # cha.histChart(decObj.getDF()["TOTAL NB"], "Ladenie Histogramu")
-
-    # Metriky nevyhladenych dat
-    # mt.metrics(modelObj.getRealUfG(), modelObj.getModel())
-
     # vyhladenie realnych ufg dat a spocitanie relativnych ufg
     realSmtObj = smt.smoothSeries(modelObj.getRealUfG(), confObj.getSmoothingMethod(),
                                   confObj.getSmoothingBin(), confObj)
@@ -91,8 +65,26 @@ def run():
                        title="Porovnanie vyhladenych realnych a modelovanych strat",
                        xLabel="DATE", yLabel="Straty [kWh]")
 
+    """
+    # Zobrazenie rozdielov dat v linecharte
+    res = pd.Series(modelObj.getRealUfG()-modelObj.getModel().shape((-1, 1)))
+
+    # DO LINE CHARTU IDU DATA TYPU PD.SERIES A DO PD SERIES KONVERTUJEM 1D ARRAY.
+    cha.lineChart(decObj.getDF()["DATE"], res,
+                  title="Zobrazenie rozdielu medzi modelom a realnymi hodnotami",
+                  xLabel="Datum", yLabel="Sledovany rozdiel hodnot")
+
+    # PO PREROBENI, DO HISTOGRAMU IDU NDARRAYS(1d)
+    # histogram rozdielov
+    cha.histChart(res, title="Zobrazenie rozlozenia rozdielov")
+    
+    # TU TO MUSIM ESTE OVERIT
+    # QQ plot rozdielov
+    cha.qqChart(res, "QQ plot zobrazujuci stav rozdielov z pohladu pripadneho normalneho rozdelenia")
+
     # Metriky vyhladenych dat
     # mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
+    """
 
     ###################################################################################################
     # Spocitanie relativnych strat
@@ -130,7 +122,9 @@ def run():
     # Metriky vyhladenych dat
     # mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
 
+    return modelObj
+
 
 # Spustenie spracovania dat
 if __name__ == "__main__":
-    run()
+    model = run()

@@ -18,7 +18,7 @@ from statsmodels.graphics.gofplots import qqplot
 import plotly.io as pio
 import plotly.graph_objects as go
 import matplotlib
-matplotlib.use("WebAgg")
+# matplotlib.use("WebAgg")
 pio.renderers.default = "browser"
 
 

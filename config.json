@@ -5,7 +5,7 @@
        },
     "setInterval":{
             "beg":"2018-01-01 00:00:00",
-            "end":"2023-03-07 00:00:00",
+            "end":"2022-12-31 00:00:00",
             "dbeg":"2022-12-01 00:00:00",
             "dend":"2022-12-31 00:00:00"
     },
@@ -92,7 +92,6 @@
              "Brumovice I. WITHDRAW",
              "Brumovice II. WITHDRAW",
              "Dunajovice INJECTION",
-             "Háje INJECTION",
              "Lobodice INJECTION",
              "Třanovice INJECTION",
              "Tvrdonice INJECTION",

@@ -110,6 +110,22 @@ class processModel:
 
         return self._df["Intakes"].to_numpy()
 
+    def getAnalysedData(self):
+        """
+        Funkcia vrati data, s ktorymi pracujem napr. v casti lsq.
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        """
+        return self._data
+
+    def getListOfAnalysedStations(self):
+
+        return self._listOfStations
+
     def getTimeVec(self):
         """
         Metoda vrati rcasovy vektor
