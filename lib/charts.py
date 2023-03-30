@@ -155,6 +155,7 @@ def histChart(res, title):
     plt.show()
     """
 
+    """
     x = res
     hist_data = [x]
     group_labels = ['distplot']  # name of the dataset
@@ -174,8 +175,39 @@ def histChart(res, title):
                               line=dict(color='rgba(0,255,0, 0.6)',
                                         width=1),
                               name='normal'
-                              ))
+                                  ))
+    """
 
+    fig = go.Figure(data=[go.Histogram(x=res, marker=go.histogram.Marker(color="orange"))])
+    fig.update_layout(
+
+        title=dict(text=title),
+        xaxis_title="Residuals",
+        yaxis_title="Frequency",
+
+        autosize=False,
+        width=1000,
+        height=500,
+        margin=dict(
+            l=50,
+            r=50,
+            b=100,
+            t=100,
+            pad=4
+        ),
+
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1,
+            title="Resituals"
+        ),
+
+        showlegend=True,
+        plot_bgcolor='white'
+    )
     fig.show()
 
     return fig

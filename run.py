@@ -65,11 +65,9 @@ def run():
                        title="Porovnanie vyhladenych realnych a modelovanych strat",
                        xLabel="DATE", yLabel="Straty [kWh]")
 
-    """
-    # Zobrazenie rozdielov dat v linecharte
-    res = pd.Series(modelObj.getRealUfG()-modelObj.getModel().shape((-1, 1)))
+    # Zobrazenie rozdielov dat v linecharte. Pomocou flatten, ndarray rozmer 2D prekonvertujem na 1D
+    res = pd.Series(modelObj.getRealUfG().flatten()-modelObj.getModel())
 
-    # DO LINE CHARTU IDU DATA TYPU PD.SERIES A DO PD SERIES KONVERTUJEM 1D ARRAY.
     cha.lineChart(decObj.getDF()["DATE"], res,
                   title="Zobrazenie rozdielu medzi modelom a realnymi hodnotami",
                   xLabel="Datum", yLabel="Sledovany rozdiel hodnot")
@@ -77,14 +75,13 @@ def run():
     # PO PREROBENI, DO HISTOGRAMU IDU NDARRAYS(1d)
     # histogram rozdielov
     cha.histChart(res, title="Zobrazenie rozlozenia rozdielov")
-    
+
     # TU TO MUSIM ESTE OVERIT
     # QQ plot rozdielov
     cha.qqChart(res, "QQ plot zobrazujuci stav rozdielov z pohladu pripadneho normalneho rozdelenia")
 
     # Metriky vyhladenych dat
     # mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
-    """
 
     ###################################################################################################
     # Spocitanie relativnych strat
@@ -122,9 +119,9 @@ def run():
     # Metriky vyhladenych dat
     # mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
 
-    return modelObj
+    return decObj, modelObj
 
 
 # Spustenie spracovania dat
 if __name__ == "__main__":
-    model = run()
+    data, model = run()
