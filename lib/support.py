@@ -173,7 +173,7 @@ def reduceDataArray(coef, data, listOfStations, confObj):
         maxIdx = np.where(abs(coef) == maxElement)
 
         coefOut = np.delete(coef, maxIdx[0])
-        listOfStationsOut = np.delete(listOfStations, maxIdx[0])
+        listOfStationsOut = list(np.delete(listOfStations, maxIdx[0]))
         dataOut = np.delete(data, maxIdx[0], axis=1)
 
         stop = True

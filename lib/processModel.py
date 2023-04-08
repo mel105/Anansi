@@ -73,6 +73,19 @@ class processModel:
         #                  self._conf.getDEnd())
 
     # GET FUNKCIE
+    def getModelRegressors(self):
+        """
+        Metoda vrati regresory, cize koeficienty zvoleneho modelu
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        """
+
+        return self._coef
+
     def getModel(self):
         """
         Metoda vrati odhadnute modelove hodnoty
@@ -167,18 +180,29 @@ class processModel:
             coef, A, dh, Qvv, N, valEst = lsq.processLSQ(self._data, self._lVec, self._weightVec,
                                                          calcFitStat, self._listOfStations, self._conf)
 
-            # Tu nasleduje zhodnotenie koeficientov a vylucenie toho signalu, ktoreho koeficient je
-            # najvacsi a nesplnuje podmienku, aby jeho hodnota bola  Coef >= -0.01 && Coef <=0.01
+            # K uvahe. Tu by mohla nasledovat procedura, v ktorej prebehne:
+            # A.) zhodnotenie koeficientov a vylucenie toho signalu, ktoreho koeficient je najvacsi a
+            # nesplnuje podmienku, aby jeho hodnota bola  Coef >= -0.01 && Coef <=0.01. Tu dochadza k postupu
+            # podla ktoreho po vyluceni toku z vysokym koeficientom odznova prepocitavam fitovanie a procest
+            # vylucovania tokov a noveho fitovania konci vtedy, ked vsetky koeficienty su pod preferovanou
+            # hodnotou. Proces je zdlhavy a moze odfiltrovat velka tokov. Rozumnejsie by bolo rucne nastavovat
+            # konfiguraciu a trafit sa do takej sustavy, ktora bude z pohladu vyrovnania rozumna.
             stopDataCrit, coefOut, dataOut, maxIdx, maxElem, listOfStationsOut = msupp.reduceDataArray(
                 coef, self._data, self._listOfStations, self._conf)
 
             # Update povodnych kontajnerov
             self._data = dataOut
             coef = coefOut
+            self._coef = coef
             self._listOfStations = listOfStationsOut
 
             if self._conf.getAddIntercept():
                 self._listOfStations.insert(0, "Constant")
+
+            # B.) prenastavim vsetky koeficienty, ktore su vacsie ako pozadovany limitna hodnota koeficientov
+            # prave na hodnotu limit koeficientov. To urobim mimo While loop. Problem je ale ten, ze k nim
+            # nebudeme mat Qvv ani ziadne ine statistiky, ktore by mam poukazali na presnost koeficientov.
+            # alebo vyrobim este nieco, co nazveme alternative model. Vysledkom budu filtrovane koef a valEst.
 
         # Celkove calc UfG
         self._valEst = valEst
