@@ -6,7 +6,7 @@ Created on Fri Mar 10 17:12:33 2023
 @author: mel
 """
 
-# from lib.processModel import processModel
+import numpy as np
 
 
 class processUfg:
@@ -16,10 +16,17 @@ class processUfg:
         ktora sa postara o to, aby sa spocitali modelovane relativne ufg.
     """
 
-    def __init__(self, modelObj):
+    def __init__(self, prepinac, modelObj):
 
         self._relRealUfG = modelObj.getRealUfG() / modelObj.getIntakes().reshape((-1, 1))
-        self._relCalcUfG = modelObj.getModel().reshape((-1, 1)) / modelObj.getIntakes().reshape((-1, 1))
+
+        if prepinac:
+
+            self._relCalcUfG = np.array(modelObj.getAltModel()).reshape(
+                (-1, 1)) / modelObj.getIntakes().reshape((-1, 1))
+        else:
+
+            self._relCalcUfG = modelObj.getModel().reshape((-1, 1)) / modelObj.getIntakes().reshape((-1, 1))
 
     def getRealUfG(self):
         """

@@ -10,8 +10,9 @@ import pandas as pd
 
 import lib.lsq as lsq
 import lib.support as msupp
-import lib.decoder as dec
-import lib.plotter as mplt
+# import lib.decoder as dec
+# import lib.plotter as mplt
+import lib.alternativeModel as alm
 
 
 class processModel:
@@ -86,6 +87,19 @@ class processModel:
 
         return self._coef
 
+    def getAltModelRegressors(self):
+        """
+        Metoda vrati regresory, cize koeficienty zvoleneho alternativneho modelu
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        """
+
+        return self._coefAlt
+
     def getModel(self):
         """
         Metoda vrati odhadnute modelove hodnoty
@@ -97,6 +111,13 @@ class processModel:
         """
 
         return self._valEst
+
+    def getAltModel(self):
+        """
+        Metoda vrati alternativny model
+        """
+
+        return self._valAlt
 
     def getRealUfG(self):
         """
@@ -180,6 +201,7 @@ class processModel:
             coef, A, dh, Qvv, N, valEst = lsq.processLSQ(self._data, self._lVec, self._weightVec,
                                                          calcFitStat, self._listOfStations, self._conf)
 
+            """
             # K uvahe. Tu by mohla nasledovat procedura, v ktorej prebehne:
             # A.) zhodnotenie koeficientov a vylucenie toho signalu, ktoreho koeficient je najvacsi a
             # nesplnuje podmienku, aby jeho hodnota bola  Coef >= -0.01 && Coef <=0.01. Tu dochadza k postupu
@@ -196,9 +218,15 @@ class processModel:
             self._coef = coef
             self._listOfStations = listOfStationsOut
 
+            """
+
+            self._coef = coef
+
             if self._conf.getAddIntercept():
+
                 self._listOfStations.insert(0, "Constant")
 
+            stopDataCrit = False
             # B.) prenastavim vsetky koeficienty, ktore su vacsie ako pozadovany limitna hodnota koeficientov
             # prave na hodnotu limit koeficientov. To urobim mimo While loop. Problem je ale ten, ze k nim
             # nebudeme mat Qvv ani ziadne ine statistiky, ktore by mam poukazali na presnost koeficientov.
@@ -208,4 +236,11 @@ class processModel:
         self._valEst = valEst
 
         # Statistiky po vyrovnani modelu
-        lsq.summary(self._lVec, self._valEst, self._listOfStations, A, dh,  Qvv, N, coef, self._probUp)
+        lsq.summary(self._lVec, self._valEst, self._listOfStations, A, dh,  Qvv, N, coef.T, self._probUp)
+
+        # Alternative model
+        altObj = alm.alternativeModel(coef, self._data, self._conf.getAddIntercept(),
+                                      self._conf.getLimitRelativeUfG())
+
+        self._valAlt = altObj.getAltModel()
+        self._coefAlt = altObj.getAltCoef()

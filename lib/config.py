@@ -120,6 +120,18 @@ class config:
 
         return self._maxIter
 
+    def getAlternativeModel(self):
+        """
+        Funkcia vrati prepinac medzi alternativnym True model a regularnym False modelom
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        """
+        return self._alternativeModel
+
     def getLimitRelativeUfG(self):
         """
         Funkcia vrati hodnotu, ktora symbolizuje limitnu predpokladanu chybu v realnom UfG
@@ -281,6 +293,7 @@ class config:
         self._epsVal = cf["setLSQ"]["epsVal"]
 
         # prevezme nastavenie tykajcue sa spracovania modelu
+        self._alternativeModel = cf["setModel"]["alternativeModel"]
         self._limitRelativeUfG = cf["setModel"]["limitRelativeUfG"]
         self._calcWeights = cf["setModel"]["calcWeights"]
         self._addIntercept = cf["setModel"]["addIntercept"]

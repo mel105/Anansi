@@ -54,8 +54,16 @@ def run():
     realSmtObj = smt.smoothSeries(modelObj.getRealUfG(), confObj.getSmoothingMethod(),
                                   confObj.getSmoothingBin(), confObj)
 
+    # prepinac medzi alternativnym a regularnym modelom
+    if confObj.getAlternativeModel():
+
+        model = modelObj.getAltModel()
+    else:
+
+        model = modelObj.getModel()
+
     # Vyhladenie rady modelu pat dnovym priemerom a spocitanie relativnych UfG
-    calcSmtObj = smt.smoothSeries(modelObj.getModel(), confObj.getSmoothingMethod(),
+    calcSmtObj = smt.smoothSeries(model, confObj.getSmoothingMethod(),
                                   confObj.getSmoothingBin(), confObj)
 
     # Porovnanie vyhladenych casovych radov
@@ -66,7 +74,7 @@ def run():
                        xLabel="DATE", yLabel="Straty [kWh]")
 
     # Zobrazenie rozdielov dat v linecharte. Pomocou flatten, ndarray rozmer 2D prekonvertujem na 1D
-    res = pd.Series(modelObj.getRealUfG().flatten()-modelObj.getModel())
+    res = pd.Series(modelObj.getRealUfG().flatten()-model)
 
     cha.lineChart(decObj.getDF()["DATE"], res,
                   title="Zobrazenie rozdielu medzi modelom a realnymi hodnotami",
@@ -85,7 +93,7 @@ def run():
 
     ###################################################################################################
     # Spocitanie relativnych strat
-    ufgObj = ufg.processUfg(modelObj)
+    ufgObj = ufg.processUfg(confObj.getAlternativeModel(), modelObj)
 
     # Porovnanie realtivnych [%] casovych radov
     r = ufgObj.getRealUfG()
@@ -119,9 +127,9 @@ def run():
     # Metriky vyhladenych dat
     # mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
 
-    return decObj, modelObj
+    return decObj, modelObj, confObj
 
 
 # Spustenie spracovania dat
 if __name__ == "__main__":
-    data, model = run()
+    data, model, config = run()

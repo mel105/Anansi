@@ -11,6 +11,7 @@ Skript len spracuje vybrane data a autor si osaha numpy, maticovu algebru a LSQ
 import numpy as np
 # import lib.plotter as plot
 import lib.support as msupp
+import lib.model as md
 import statistics as st
 from tabulate import tabulate
 
@@ -80,18 +81,24 @@ def processLSQ(data, lVec, W, presFitStat, listOfStations, confObj):
         numIter = numIter + 1
 
         # model
-        valVec = np.array(model(initCoef, data, confObj.getAddIntercept()))
+        # valVec = np.array(model(initCoef, data, confObj.getAddIntercept()))
+        modelObj = md.model(initCoef, data, confObj.getAddIntercept())
+        valVec = modelObj.estimation()
+        valVec = np.array(valVec)
 
         resVec = lVec-valVec.reshape((-1, 1))
 
         # Design matrix
-        A = derivative(data, confObj.getAddIntercept())
+        # A = derivative(data, confObj.getAddIntercept())
+        A = modelObj.derivative()
 
         # LSQ
         Qvv, coef, dh, N = lsqAlg(A, initCoef, resVec, W)
 
         # val est
-        valEst = np.array(model(coef, data, confObj.getAddIntercept()))
+        # valEst = np.array(model(coef, data, confObj.getAddIntercept()))
+        modelObj = md.model(coef, data, confObj.getAddIntercept())
+        valEst = np.array(modelObj.estimation())
 
         # odhad rozdielov
         # resEst = lVec-valEst.reshape((-1, 1))
@@ -162,6 +169,7 @@ def summary(lVec, eVec, stations, A, dh, Qvv, N, coef, probup):
 
     # Standardized coefficients
     std = standardCoef(coef, lVec,  A)
+    std = np.array(std)
 
     # intervaly spolahlivosti
     islow = initCoef - 1.960*mC
@@ -204,7 +212,7 @@ def standardCoef(coef, lVec, A):
     std = []
     a, b = A.shape
     for i in range(b):
-        std.append(coef[i]*(st.stdev(A[:, i])/y))
+        std.append(coef[i]*(st.stdev(A[:, i])/y))  # to s dvoma indexami v coef je divne a nutne poriesit.
 
     return std
 
@@ -326,15 +334,16 @@ def lsqAlg(A, initCoef0, lvec, W):
     return Qvv, initCoef, dh, N
 
 
+"""
 def derivative(inp, inter):
-    """
+    "" "
      Funkcia vrati matici dizajnu
 
      Returns
      -------
      None.
 
-    """
+    "" "
 
     if inter:
         # v pripade, ak by som chcel modelovat aj abs. clek. V jacobi matici, prvy stlpec jednickovy.
@@ -347,14 +356,15 @@ def derivative(inp, inter):
 
 
 def model(coef, inp, inter):
-    """
-     Funkcia obsahuje model, ktory fitujem
+    "" "
+     Funkcia obsahuje model, ktory fitujem. Na vstupe sa nachadzaju jak odhadnute koeficienty, tak aj vstupne
+     data tokov. Vysledkom je model strat, ktory ziskam prenasobenim koeficientov a tokov.
 
     Returns
     -------
     None.
 
-    """
+    "" "
 
     # kontrola, ze ci coef je slpcovy alebo riadkovy vektor. Potrebujem stlpcovy
     msize = coef.shape
@@ -365,7 +375,7 @@ def model(coef, inp, inter):
     val = []
 
     if inter:
-        # MELTODO: Model obsahuje aj abs. clen. No zatial nefunguje dobre
+
         for i in range(len(inp)):
             tmp = float(coef[0])
             for j in range(len(coef)-1):
@@ -374,6 +384,7 @@ def model(coef, inp, inter):
 
             val.append(tmp)
     else:
+
         for i in range(len(inp)):
             tmp = 0
             for j in range(len(coef)):
@@ -383,3 +394,4 @@ def model(coef, inp, inter):
             val.append(tmp)
 
     return val
+"""
