@@ -36,7 +36,7 @@ class alternativeModel:
         # nahradime prave za maxLoss parameter
         self._filterCoefs(coef.T, maxLoss)
 
-        # Objekt model okderm derivacie mdoelu obsahuje aj odhad modelu samotneho.
+        # Objekt model okrem derivacie modelu obsahuje aj odhad modelu samotneho.
         modelObj = md.model(self._altCoef, inp, inter, calcDeriv=False, calcModel=True)
         self._valAlt = modelObj.estimation()
 

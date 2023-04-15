@@ -18,8 +18,54 @@ from statsmodels.graphics.gofplots import qqplot
 import plotly.io as pio
 import plotly.graph_objects as go
 import matplotlib
-# matplotlib.use("WebAgg")
+matplotlib.use("WebAgg")
 pio.renderers.default = "browser"
+
+
+def prediction(mtim, mdat, ptim, real, pred, ci):
+    """
+    Funkcia kresli predickciu na zaklade zvoleneho modelu a znamych buducich tokov
+
+    Parameters
+    ----------
+    mtim : TYPE
+        DESCRIPTION. Vektor casu validny pre model
+    mdat : TYPE
+        DESCRIPTION. Vektor dat pre model
+    ptim : TYPE
+        DESCRIPTION. Vektor casu validny pre hodnoty predikcie
+    real : TYPE
+        DESCRIPTION. Vektor realnych merani v casti predikcie
+    pred : TYPE
+        DESCRIPTION. Vektor odhadu v casti predikcie
+    ci : TYPE
+        DESCRIPTION. 95% interval spolahlivosti
+
+    Returns
+    -------
+    int
+        DESCRIPTION
+
+    """
+
+    fig, ax = plt.subplots(figsize=(15, 7))
+    # zobrazenie modelu
+    ax.plot(mtim, mdat, color="#b35151", label="Model Estimations")
+
+    # zobrazenie predikovanej casti
+    ax.plot(ptim, real, color="#e68484", label="Measurements")
+    ax.plot(ptim, pred, color='#707070', label='Predictions')
+
+    # ax.scatter(valid.index, sarima_preds)
+    ax.fill_between(ptim, (pred-ci), (pred+ci), color='b', alpha=.1, label="95% Confidence Interval")
+    ax.set_title("Predictions model")
+    ax.set_xlabel('Date')
+    ax.set_ylabel('UfG')
+    ax.legend()
+
+    plt.show()
+
+    return 0
 
 
 def heatmapDiagram(df):

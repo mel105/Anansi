@@ -265,6 +265,53 @@ class config:
         """
         return self._descStations
 
+    def getValidation(self):
+        """
+        Funkcia vrati prepinac validation. To znamena, ze ak je True, pozadujem validaciu modela. Ak False,
+        validaciu nepozadujem. Pozor, treba sa rozhodnut s ohladom na time span.
+
+        Returns
+        -------
+        _validation : TYPE
+            DESCRIPTION.
+
+        """
+
+        return self._validation
+
+    def getPrediction(self):
+        """
+        Funkcia vrati priznak prediction. Ten je validny, iba ak je validation Trie. Ak je prediction True,
+        to znamena, ze pozadujem zhodnotit model tak, ze vezmem poslednu cast roka alebo nejaku cast dat a tu
+        extrapolujem pomocou ziskanych konstant nasho modelu. Potom vysledkom su spocitane metriky, ktore
+        ukazuju na kvalitu validacie. Ak je prediction False, potom pozadujem vybrat X% nahodnych bodov v
+        modele, ich hodnoty odhadnem pomocou modelu a porovnam ich s hodnotami, ktore som si bokom odlozil.
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        """
+
+        return self._prediction
+
+    def getValidchart(self):
+        """
+        Metoda vrati priznak, podla ktoreho sa rozhodnem, ze ci v triede validation budem aj kreslit. Trocha
+        sa mi to nepozdava z toho pohladu, ze trieda by mala validovat a na kreslenie by mal byt priestor v
+        inej casti kodu. Ale z praktickeho hladiska sa to hodi, a mam tam vsetky data. Plotitko bude impleme-
+        tovane v triede charts.
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        """
+
+        return self._validchart
+
     ###################################################################################################
     # protected funkcie
 
@@ -298,6 +345,11 @@ class config:
         self._calcWeights = cf["setModel"]["calcWeights"]
         self._addIntercept = cf["setModel"]["addIntercept"]
         self._probUp = cf["setModel"]["probUp"]
+
+        # prevezme nastavenie validacie modela
+        self._validation = cf["setValidation"]["validation"]
+        self._prediction = cf["setValidation"]["prediction"]
+        self._validchart = cf["setValidation"]["validchart"]
 
         # zoznam stanic a zoznam prenasobovacich konstant
         self._listStations = cf["setStations"]["stations"]

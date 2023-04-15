@@ -36,6 +36,9 @@ def fillDataContainer(df, listOfStations):
     """
 
     # vyroba kontajnera. Z historickych dovodov zatial pracujem s polom
+    if "Constant" in listOfStations:
+        listOfStations.remove("Constant")
+
     d = {i: df[[i]] for i in listOfStations}
     data = pd.concat(d, axis=1).groupby(axis=1, level=0).sum()
 
@@ -86,47 +89,6 @@ def calcWeights(unt, df):
         wVec = np.ones(df.shape[0])
 
     return np.diag(wVec)
-
-
-def metrics(refVec, estVec):
-    """
-    Funkcia vrati zakladne metriky pre porovnanie modelu vs. merania
-
-    Parameters
-    ----------
-    refVec : TYPE numpy.mdarray
-        DESCRIPTION. Referencne hodnoty
-    estVec : TYPE numpy.mdarray
-        DESCRIPTION. Odhadnute hodnty modelu
-
-    Returns
-    -------
-    rmse : TYPE float
-        DESCRIPTION. root mean squared error
-    mae : TYPE float
-        DESCRIPTION. mean average error
-    bias : TYPE float
-        DESCRIPTION. systematicka chyba
-    """
-
-    mError = refVec - estVec
-
-    # RMSE
-    squaredError = mError ** 2
-    meanSquaredError = squaredError.mean()
-    rmse = np.sqrt(meanSquaredError)
-
-    # MAE
-    absError = abs(mError)
-    mae = absError.mean()
-
-    # BIAS
-    bias = mError.mean()
-
-    # Suma chyb
-    sumaError = sum(mError)
-
-    return rmse, mae, bias, sumaError
 
 
 def reduceDataArray(coef, data, listOfStations, confObj):

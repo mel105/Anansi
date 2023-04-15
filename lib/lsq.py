@@ -11,6 +11,7 @@ Skript len spracuje vybrane data a autor si osaha numpy, maticovu algebru a LSQ
 import numpy as np
 # import lib.plotter as plot
 import lib.support as msupp
+import lib.metrics as mt
 import lib.model as md
 import statistics as st
 from tabulate import tabulate
@@ -119,7 +120,7 @@ def processLSQ(data, lVec, W, presFitStat, listOfStations, confObj):
             stopFitCrit = False
 
         # statistiky porovnania modelu a dat.
-        rmse, mae, bias, sumError = msupp.metrics(lVec, valEst)
+        rmse, mae, bias, sumError = mt.metrics(lVec, valEst)
         # print(
         #     f"RMSE: {rmse: 0.2f}/MAE: {mae: 0.2f}/BIAS: {bias: 0.2f}/SUMA: {sumError[0]: .2f}")
 

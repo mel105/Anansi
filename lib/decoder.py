@@ -46,6 +46,9 @@ class decoder:
 
         self._dfred = self._df
 
+        # kopia df matice. To pre neskorsiu validaciu
+        self._dfFull = self._df
+
         # definovanie si stlpcov, ktore nie su numerickeho typu
         for i in self._dfred.columns:
             j = pd.to_numeric(self._dfred[i], errors='coerce').notnull().all()
@@ -59,6 +62,18 @@ class decoder:
 
         self._dfred = self._dfred[(self._dfred['DATE'] >= confObj.getBeg()) &
                                   (self._dfred['DATE'] <= confObj.getEnd())]
+
+    def getDFfull(self):
+        """
+        Funkcia vrati kompletne data, nie fitrovane od-do.
+
+        Returns
+        -------
+        TYPE
+            DESCRIPTION.
+
+        """
+        return self._dfFull
 
     def getDFred(self):
         """

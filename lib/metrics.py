@@ -9,20 +9,21 @@ Created on Thu Mar  2 18:07:20 2023
 import numpy as np
 from scipy.stats import spearmanr
 from sklearn.metrics import r2_score
-import lib.plotter as plot
+from tabulate import tabulate
+# import lib.plotter as plot
 
 
-def metrics(lVec, eVec):
+def metrics(refVec, estVec):
     """
-    Funkcia na plochu vypise suhrn odhadovanych metrik, ktore sa tykaju presnosti medzi modelom a orig
+    Funkcia vypise suhrn odhadovanych metrik, ktore sa tykaju pmErrornosti medzi modelom a orig
     datmi
 
     Parameters
     ----------
-    lVec : TYPE
-        DESCRIPTION.
-    eVec : TYPE
-        DESCRIPTION.
+    refVec : TYPE
+        DESCRIPTION. vektor referencnych dat
+    estVec : TYPE
+        DESCRIPTION. vektor odhadovanych dat
 
     Returns
     -------
@@ -31,42 +32,54 @@ def metrics(lVec, eVec):
 
     """
 
-    # statistiky, tykajuce sa rozdielu modelu a merani
-    # res = lVec-eVec.reshape((-1, 1))
-    res = lVec-eVec
+    mError = refVec - estVec
 
-    print("\n\n         RESIDUALS:      ")
-    print("-----------------------------")
-    print(f"MIN: {np.quantile(res, 0.00):.2f}")
-    print(f"Q25: {np.quantile(res, 0.25):.2f}")
-    print(f"MED: {np.quantile(res, 0.50):.2f}")
-    print(f"Q75: {np.quantile(res, 0.75):.2f}")
-    print(f"MAX: {np.quantile(res, 1.00):.2f}")
+    # ###### STATISTIKY, KTORE SA TYKAJU OPISU CHYB MEDZI REF. A ODHADOVANYM SUBOROM DAT ######
+    # RMSE
+    squaredError = mError ** 2
+    meanSquaredError = squaredError.mean()
+    rmse = np.sqrt(meanSquaredError)
+
+    # MAE
+    absError = abs(mError)
+    mae = absError.mean()
+
+    # BIAS
+    bias = mError.mean()
+
+    # Suma chyb
+    sumaError = sum(mError)
+
+    # ##### STATISTIKY, KTORE SA TYKAJU KVALITY APROXIMACIE ############
 
     # RSE, CD
-    lVecMean = lVec.mean()
-    ST = .0
-    SC = .0
-    for idx, i in enumerate(lVec):
-        ST += np.power(eVec[idx]-lVecMean, 2)
-        SC += np.power(lVec[idx]-lVecMean, 2)
+    # refVecMean = refVec.mean()
+    # ST = .0
+    # SC = .0
+    # for idx, i in enumerate(refVec):
+    #     ST += np.power(estVec[idx]-refVecMean, 2)
+    #     SC += np.power(refVec[idx]-refVecMean, 2)
 
-    CD = 1-ST/SC
-    R, _ = spearmanr(lVec, eVec)
-    R22 = r2_score(lVec, eVec)
-    R2 = np.power(R, 2)
+    # CD = 1-ST/SC
+    # R, _ = spearmanr(refVec, estVec)
+    # R22 = r2_score(refVec, estVec)
+    # R2 = np.power(R, 2)
 
-    print(f"R: {R:0.3f}")
-    print(f"R2: {R2:0.3f}")
-    print(f"R22: {R22:0.3f}")
-#    print(f"D: {CD[0]:0.3f}")
+    # ######## VYPIS NA PLOCHU. SUBOR METRIK OBSAHUJE AK KVANTILY ROZDELENIA ##########
+    # tabulka na plochu
+    print("\nOdhad metrik:\n")
 
-    # Scatter graf
-    # plot.plotScatter(lVec, eVec)
+    table = [
+        ["MIN", np.quantile(mError, 0.00)],
+        ["Q25", np.quantile(mError, 0.25)],
+        ["Q50", np.quantile(mError, 0.50)],
+        ["Q75", np.quantile(mError, 0.75)],
+        ["MAX", np.quantile(mError, 1.00)],
+        ["RMS", rmse],
+        ["MAE", mae],
+        ["BIAS", bias],
+        ["SUME", sumaError]]
 
-    # Histogram rozdielov
-    print("\n\n         HISTOGRAM:      ")
-    print("-----------------------------")
-    plot.plotHistogram(res)
-    print("OK")
-    return 0
+    print(tabulate(table, headers=["Statistics", "Estimation"], tablefmt="outline", floatfmt=".7f"))
+
+    return rmse, mae, bias, sumaError
