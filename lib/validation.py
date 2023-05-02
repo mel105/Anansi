@@ -45,6 +45,7 @@ class validation:
 
             # pokial setEndTime > posledna hodnota v DF, potom nema zmysel robit nejaku predikciu
             if setEndTime >= lastTime:
+                
                 print("No Validation")
             else:
 

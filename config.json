@@ -1,7 +1,7 @@
 {
     "setInput":{
             "inpFileName": ["python"],
-            "inpLocalPath":"/home/mel/Dokumenty/M/Anansi/data"
+            "inpLocalPath":"/home/mel/Documents/M/Anansi/data"
        },
     "setInterval":{
             "beg":"2020-01-01 00:00:00",

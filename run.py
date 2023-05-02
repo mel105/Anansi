@@ -43,6 +43,18 @@ def run():
 
     # Spracovanie modelu. Polozka 0 v hore preddefinovanom zozname uloh.
     modelObj = prc.processModel(confObj, decObj)
+    
+    # Ak je pozadovane, aby bola vykonana zhodnotenie modelu pomocou metrik
+    # Je potreba doplnit R2 a celkovo precistit metriky
+    
+    # Ak je pozadovane, tak vyrobit triedu, ktora sa povenuje stratam
+    #  mapa strat
+    #  analyza, ktora by povedala narast ci pokles dennecy stat k predposlednemu
+    #  dnu alebo k medianu strat pre dany tok... ktora stanica v pomere k percentu
+    #  straty aku ma stratu. zoznam stanic s najvyznamnejsimi stratami a tak podobne
+    
+    
+    # ak je potreba, tak predikciu resp forecast, tak ako to je v stavajucom 
 
     # Ak je pozadovana validacia modelu, tak model validujem.
     if confObj.getValidation():
