@@ -101,7 +101,7 @@ def heatmapDiagram(df):
     fig2 = plt.figure(figsize=(25, 35))
     heatmap = sns.heatmap(corrmat[['TOTAL NB']].sort_values(by='TOTAL NB', ascending=False), vmin=-1, vmax=1,
                           annot=True, cmap='BrBG')
-    heatmap.set_title('Features Correlating with Sales Price', fontdict={'fontsize': 35}, pad=10)
+    heatmap.set_title("Features Correlating with TOTAL NB", fontdict={'fontsize': 35}, pad=10)
 
     plt.savefig('my_plot_2.png')
     # fig = go.Figure(data=go.Heatmap(corrmat, hoverongaps=False))
@@ -123,7 +123,7 @@ def heatmapDiagram(df):
     fig1.show()
     fig2.show()
 
-    return fig1, fig2
+    return fig1, fig2, corrmat, mask
 
 
 def scatterMatrix(df):

@@ -16,16 +16,16 @@ Postupne by tento skript ma zastresit tieto ukony:
 @author: mel
 """
 
-# import pandas as pd
+import pandas as pd
 import lib.config as cfg
 import lib.processModel as prc
-# import lib.smoothSeries as smt
-# import lib.metrics as mt
-# import lib.processUfg as ufg
+import lib.smoothSeries as smt
+import lib.metrics as mt
+import lib.processUfg as ufg
 import lib.decoder as dc
 import lib.validation as vl
-# import lib.descriptive as ds
-# import lib.charts as cha
+import lib.descriptive as ds
+import lib.charts as cha
 
 
 def run():
@@ -43,18 +43,17 @@ def run():
 
     # Spracovanie modelu. Polozka 0 v hore preddefinovanom zozname uloh.
     modelObj = prc.processModel(confObj, decObj)
-    
+
     # Ak je pozadovane, aby bola vykonana zhodnotenie modelu pomocou metrik
     # Je potreba doplnit R2 a celkovo precistit metriky
-    
+
     # Ak je pozadovane, tak vyrobit triedu, ktora sa povenuje stratam
     #  mapa strat
     #  analyza, ktora by povedala narast ci pokles dennecy stat k predposlednemu
     #  dnu alebo k medianu strat pre dany tok... ktora stanica v pomere k percentu
     #  straty aku ma stratu. zoznam stanic s najvyznamnejsimi stratami a tak podobne
-    
-    
-    # ak je potreba, tak predikciu resp forecast, tak ako to je v stavajucom 
+
+    # ak je potreba, tak predikciu resp forecast, tak ako to je v stavajucom
 
     # Ak je pozadovana validacia modelu, tak model validujem.
     if confObj.getValidation():
@@ -62,7 +61,7 @@ def run():
         vl.validation(confObj, decObj, modelObj)
 
     # ZAKOMENTOVANA CAST KODU FUNGUJE, ALE PRE TESTOVANIE VALIDACIE JU NEPOTREBUJEM.
-    """
+
     # vyhladenie realnych ufg dat a spocitanie relativnych ufg
     realSmtObj = smt.smoothSeries(modelObj.getRealUfG(), confObj.getSmoothingMethod(),
                                   confObj.getSmoothingBin(), confObj)
@@ -93,17 +92,15 @@ def run():
                   title="Zobrazenie rozdielu medzi modelom a realnymi hodnotami",
                   xLabel="Datum", yLabel="Sledovany rozdiel hodnot")
 
-    # PO PREROBENI, DO HISTOGRAMU IDU NDARRAYS(1d)
     # histogram rozdielov
     cha.histChart(res, title="Zobrazenie rozlozenia rozdielov")
 
-    # TU TO MUSIM ESTE OVERIT
     # QQ plot rozdielov
     cha.qqChart(res, "QQ plot zobrazujuci stav rozdielov z pohladu pripadneho normalneho rozdelenia")
 
     # Metriky vyhladenych dat
     # mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
-
+    """
     ###################################################################################################
     # Spocitanie relativnych strat
     ufgObj = ufg.processUfg(confObj.getAlternativeModel(), modelObj)
