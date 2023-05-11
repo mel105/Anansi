@@ -26,6 +26,7 @@ import lib.decoder as dc
 import lib.validation as vl
 import lib.descriptive as ds
 import lib.charts as cha
+import lib.linearity as lin
 
 
 def run():
@@ -36,11 +37,17 @@ def run():
     fileName = confObj.getInpFileName()
     filePath = confObj.getInpFilePath()
     decObj = dc.decoder(fileName, filePath, confObj)
-
+    
+    # vygenerovanie scatter plotov, kde sa zobrazuju vztahy medzi ufg a 
+    # nezavislym parametrom
+    # MELTODO doplnit moznost konfiguracie
+    lin.linearity(decObj)
+    
     # Analyza kazdej jednej nezavislej premennej, kazdej jednej rady, ktora vstupuje do modelu
     # 1. Statisticky opis rady
     # ds.descriptive(confObj, decObj)
 
+    """
     # Spracovanie modelu. Polozka 0 v hore preddefinovanom zozname uloh.
     modelObj = prc.processModel(confObj, decObj)
 
@@ -101,6 +108,7 @@ def run():
     # Metriky vyhladenych dat
     # mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
     """
+    """
     ###################################################################################################
     # Spocitanie relativnych strat
     ufgObj = ufg.processUfg(confObj.getAlternativeModel(), modelObj)
@@ -137,9 +145,10 @@ def run():
     # Metriky vyhladenych dat
     # mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
     """
-    return decObj, modelObj, confObj
+    return decObj #, modelObj, confObj
 
 
 # Spustenie spracovania dat
 if __name__ == "__main__":
-    data, model, config = run()
+    run()
+    # data, model, config = run()

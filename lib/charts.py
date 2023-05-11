@@ -21,6 +21,36 @@ import matplotlib
 matplotlib.use("WebAgg")
 pio.renderers.default = "browser"
 
+def scatterPlot(xVec, yVec, mTitle=" ", xLabel=" ", yLabel=" "):
+    """
+    Metoda vykresli scatter plot vektorov x, y
+
+    Parameters
+    ----------
+    x : TYPE
+        DESCRIPTION.
+    y : TYPE
+        DESCRIPTION.
+    mTitle : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
+    fig = go.Figure(data=go.Scattergl(
+    x = xVec,
+    y = yVec,
+    mode='markers',
+    marker=dict(
+        color=10,
+        colorscale='Viridis',
+        line_width=1
+        )
+    ))
+
+    fig.show()
 
 def prediction(mtim, mdat, ptim, real, pred, ci):
     """
