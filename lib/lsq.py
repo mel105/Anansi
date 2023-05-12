@@ -9,6 +9,7 @@ Skript len spracuje vybrane data a autor si osaha numpy, maticovu algebru a LSQ
 """
 
 import numpy as np
+import csv
 # import lib.plotter as plot
 import lib.support as msupp
 import lib.metrics as mt
@@ -194,10 +195,27 @@ def summary(lVec, eVec, stations, A, dh, Qvv, N, coef, probup):
         row = [stations[i], initCoef[i], std[i], mC[i], tstat[i], pval[i], islow[i], isup[i]]
         table.append(row)
 
+    header = ["Station", "Coef", "Standardized Coef", "Standard Deviation",
+              "t-stat", "p-val", "Lower Bound", "Upper Bound"]
+
     print(tabulate(table,
-                   headers=["Station", "Coef", "Standardized Coef", "Standard Deviation",
-                            "t-stat", "p-val", "Lower Bound", "Upper Bound"],
+                   headers=header,
                    tablefmt="outline"))
+
+    with open('results.csv', 'w', encoding='UTF8') as f:
+        writer = csv.writer(f)
+
+        # write the header
+        writer.writerow(header)
+
+        # write the data
+        writer.writerow(table)
+
+    np.savetxt("results2.csv",
+               table,
+               delimiter=", ",
+               fmt='% s')
+
     # print(
     #    f" Odhady [{i}]: {initCoef[i]: .5f}  {mC[i]: .5f}  {islow[i]: .5f}  {isup[i]: .5f}\
     # {tstat[i]:.5f}  {pval[i]:.5f} -->> {stations[i-1]}")

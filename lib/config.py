@@ -312,6 +312,55 @@ class config:
 
         return self._validchart
 
+    def getOutLocalPath(self):
+        """
+        Metoda vrati lokalnu adresu na mieto, kam sa budu ukladat vysledky
+
+        Returns
+        -------
+        None.
+
+        """
+
+        return self._outLocalPath
+
+    def getFigFolderName(self):
+        """
+        Nazov adresara, kam sa bud ukladat obrazky
+
+        Returns
+        -------
+        None.
+
+        """
+
+        return self._figFolderName
+
+    def getCsvFolderName(self):
+        """
+        Nazov adresara, kam sa budu ukladat CSV subory
+
+        Returns
+        -------
+        None.
+
+        """
+
+        return self._csvFolderName
+
+    def getLinearity(self):
+        """
+        Prepinatko: True, chcem zobrazit pomer UfG a Toku a pozriet sa na scatter, kde je zobrazeny vztach 
+        medzi datami
+
+        Returns
+        -------
+        None.
+
+        """
+
+        return self._linearity
+
     ###################################################################################################
     # protected funkcie
 
@@ -325,9 +374,14 @@ class config:
         with open("config.json") as j:
             cf = json.load(j)
 
-        # obecne nastavenie, napr. cesta/y k datam
+        # nastavenie vstupu, napr. cesta/y k datam
         self._inpFileName = cf["setInput"]["inpFileName"]
         self._inpLocalPath = cf["setInput"]["inpLocalPath"]
+
+        # nastavenie vytupu
+        self._outLocalPath = cf["setOutput"]["outLocalPath"]
+        self._figFolderName = cf["setOutput"]["figFolderName"]
+        self._csvFolderName = cf["setOutput"]["csvFolderName"]
 
         # prevezme nastavenie tykajuce sa intervalu spracovanej rady
         self._beg = cf["setInterval"]["beg"]
@@ -362,3 +416,6 @@ class config:
         # nacitanie nastavenia tykajuce sa vyberu stanice, ktoru chcem statisticky opisat.
         self._descStations = cf["setDescriptive"]["stations"]
         self._descVerbosity = cf["setDescriptive"]["verbosity"]
+
+        # nacitanie nastavenia linearity, t.j. zobrazenie ufg vs. flow
+        self._linearity = cf["setLinearity"]["linearity"]

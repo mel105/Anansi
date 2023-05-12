@@ -6,6 +6,7 @@ Created on Wed Mar 15 19:43:10 2023
 @author: mel
 """
 
+import pandas as pd
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
@@ -17,9 +18,74 @@ import plotly.figure_factory as ff
 from statsmodels.graphics.gofplots import qqplot
 import plotly.io as pio
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import matplotlib
+
 matplotlib.use("WebAgg")
 pio.renderers.default = "browser"
+
+
+def lineBarPlot(tVec, xVec, yVec, mTitle=" ", xLabel=" ", yLabel=" ", y2Label=" "):
+    """
+    Tento graf na y ose zobrazi line chart a na y2 ose bar chart
+
+    Parameters
+    ----------
+    tVec : TYPE
+        DESCRIPTION.
+    xVec : TYPE
+        DESCRIPTION.
+    yVec : TYPE
+        DESCRIPTION.
+    mTitle : TYPE, optional
+        DESCRIPTION. The default is " ".
+    xLabel : TYPE, optional
+        DESCRIPTION. The default is " ".
+    yLabel : TYPE, optional
+        DESCRIPTION. The default is " ".
+
+    Returns
+    -------
+    None.
+
+    """
+
+    # Create figure with secondary y-axis
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+    # liniova cast grafu
+    fig.add_trace(
+        go.Scatter(x=tVec, y=xVec, name=yLabel), secondary_y=False
+    )
+
+    # y2 cast grafu, barova na ktorej zovrazim toky
+    fig.add_trace(
+        go.Bar(x=tVec, y=yVec, name=y2Label), secondary_y=True
+    )
+
+    fig.update_layout(
+        title_text=mTitle,
+        title_font_size=30
+    )
+
+    # Set x-axis title
+    fig.update_xaxes(
+        title_text=xLabel,
+        title_font_size=18)
+
+    # Set y-axes titles
+    fig.update_yaxes(
+        title_text=yLabel,
+        title_font_size=15,
+        secondary_y=False)
+    fig.update_yaxes(
+        title_text=y2Label,
+        title_font_size=15,
+        secondary_y=True)
+
+    fig.show()
+    return fig
+
 
 def scatterPlot(xVec, yVec, mTitle=" ", xLabel=" ", yLabel=" "):
     """
@@ -40,17 +106,18 @@ def scatterPlot(xVec, yVec, mTitle=" ", xLabel=" ", yLabel=" "):
 
     """
     fig = go.Figure(data=go.Scattergl(
-    x = xVec,
-    y = yVec,
-    mode='markers',
-    marker=dict(
-        color=10,
-        colorscale='Viridis',
-        line_width=1
+        x=xVec,
+        y=yVec,
+        mode='markers',
+        marker=dict(
+            color=10,
+            colorscale='Viridis',
+            line_width=1
         )
     ))
 
     fig.show()
+
 
 def prediction(mtim, mdat, ptim, real, pred, ci):
     """

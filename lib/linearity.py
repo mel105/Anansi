@@ -11,23 +11,33 @@ medzi skumanym parametrom a nezavyslymmi parametrami
 
 import lib.charts as charts
 
+
 class linearity:
 
-    def __init__(self, decoder):
-        
+    def __init__(self, config, decoder):
+
         # pripravim si dataframe dat, na ktorych chcem vykreslit.
         d = decoder.getDFfull()
-        
-        x = d["TOTAL NB"]
-        
-        #y = d["Dub"]
-        #y = d["Bezměrov"]
-        #y = d["Sviňomazy"]
-        y = d["MS Bečov"]
-        
+
+        ufg = d["TOTAL NB"]
+        tm = d["DATE"]
+        saveFigPath = config.getOutLocalPath()+"/"+config.getFigFolderName()
+
+        # for cyklus cez vsetky stanice
+
+        station = "Dub"
+        mTitle = f"Porovnanie UFG vs. FLOW na stanici <b>{station}</b>"
+
+        flow = d[station]
+
+        # vykreslenie na y ose tok a na y2 ose celkove straty
+        fig = charts.lineBarPlot(tm, ufg, flow, mTitle, "DATE", "UFG [kWh]",
+                                 "FLOW [kWh]")
+
+        fig.write_image(file=saveFigPath+"/"+station+".png", format=".png")
+
         # vykreslenie linearneho vztahu
-        charts.scatterPlot(x, y)
-        
-        # ulozenie do adresara: MELTODO bude do configu upresnena adresa a 
+        # charts.scatterPlot(ufg, flow)
+
+        # ulozenie do adresara: MELTODO bude do configu upresnena adresa a
         # nazov adresara
-        

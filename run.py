@@ -27,22 +27,29 @@ import lib.validation as vl
 import lib.descriptive as ds
 import lib.charts as cha
 import lib.linearity as lin
+import lib.support as sp
 
 
 def run():
+
     # Nacitanie koniguracneho suboru
     confObj = cfg.config()
+
+    # Nastavenie adresarov, kam sa budu ukladat obrazky/subory CSV (neskor treba textove protokoly)
+    sp.checkFolder(confObj.getOutLocalPath())
+    sp.checkFolder(confObj.getOutLocalPath()+"/"+confObj.getFigFolderName())
+    sp.checkFolder(confObj.getOutLocalPath()+"/"+confObj.getCsvFolderName())
 
     # Nacitanie dat
     fileName = confObj.getInpFileName()
     filePath = confObj.getInpFilePath()
     decObj = dc.decoder(fileName, filePath, confObj)
-    
-    # vygenerovanie scatter plotov, kde sa zobrazuju vztahy medzi ufg a 
-    # nezavislym parametrom
-    # MELTODO doplnit moznost konfiguracie
-    lin.linearity(decObj)
-    
+
+    # vygenerovanie scatter plotov, kde sa zobrazuju vztahy medzi ufg a tokom, ktory by mal byt na ufg
+    # nezavisly
+    if confObj.getLinearity():
+        lin.linearity(confObj, decObj)
+
     # Analyza kazdej jednej nezavislej premennej, kazdej jednej rady, ktora vstupuje do modelu
     # 1. Statisticky opis rady
     # ds.descriptive(confObj, decObj)
@@ -145,7 +152,7 @@ def run():
     # Metriky vyhladenych dat
     # mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
     """
-    return decObj #, modelObj, confObj
+    return decObj  # , modelObj, confObj
 
 
 # Spustenie spracovania dat

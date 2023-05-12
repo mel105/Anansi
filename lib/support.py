@@ -8,6 +8,30 @@ Created on Thu Feb  9 08:40:42 2023
 
 import pandas as pd
 import numpy as np
+import os
+
+
+def checkFolder(folderPath):
+    """
+    Funkcia by mala skontrolovat existenciu adresara na vstupnej adrese. Ak adresar neexistuje, tak ho vyrobi.
+
+    Parameters:
+        folder_path: TYPE string
+                    DESCRIPTION. jedna sa cestu, kde by mal existovat prislusny adresar. Ak tam
+                    neexistuje, tak ho vyrobi.
+    Returns
+    -------
+    None.
+
+    """
+
+    checkFolderExistance = os.path.isdir(folderPath)
+
+    if not checkFolderExistance:
+
+        os.makedirs(folderPath)
+    else:
+        pass
 
 
 def fillDataContainer(df, listOfStations):
