@@ -26,7 +26,8 @@ import lib.decoder as dc
 import lib.validation as vl
 import lib.descriptive as ds
 import lib.charts as cha
-import lib.linearity as lin
+import lib.visualRelations as rel
+# import lib.visualGroups as grp
 import lib.support as sp
 
 
@@ -45,10 +46,15 @@ def run():
     filePath = confObj.getInpFilePath()
     decObj = dc.decoder(fileName, filePath, confObj)
 
-    # vygenerovanie scatter plotov, kde sa zobrazuju vztahy medzi ufg a tokom, ktory by mal byt na ufg
-    # nezavisly
+    # Vygenerovanie obrazkov, kde sa zobrazuju vztahy medzi ufg a tokom
     if confObj.getLinearity():
-        lin.linearity(confObj, decObj)
+
+        rel.linearity(confObj, decObj)
+
+    # Vygenerovanie obrazkov, kde sa analyzuju data napr. z pohladu rocny, ci tyzdennych priemerov
+    # if confObj.getGroups():
+
+    #    grp.visualGrups(confObj, decObj)
 
     # Analyza kazdej jednej nezavislej premennej, kazdej jednej rady, ktora vstupuje do modelu
     # 1. Statisticky opis rady
@@ -157,5 +163,5 @@ def run():
 
 # Spustenie spracovania dat
 if __name__ == "__main__":
-    run()
+    data = run()
     # data, model, config = run()

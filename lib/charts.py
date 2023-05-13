@@ -6,7 +6,7 @@ Created on Wed Mar 15 19:43:10 2023
 @author: mel
 """
 
-import pandas as pd
+# import pandas as pd
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
@@ -63,6 +63,7 @@ def lineBarPlot(tVec, xVec, yVec, mTitle=" ", xLabel=" ", yLabel=" ", y2Label=" 
         go.Bar(x=tVec, y=yVec, name=y2Label), secondary_y=True
     )
 
+    # Set title
     fig.update_layout(
         title_text=mTitle,
         title_font_size=30
@@ -83,7 +84,7 @@ def lineBarPlot(tVec, xVec, yVec, mTitle=" ", xLabel=" ", yLabel=" ", y2Label=" 
         title_font_size=15,
         secondary_y=True)
 
-    fig.show()
+    #  fig.show()
     return fig
 
 
@@ -114,9 +115,28 @@ def scatterPlot(xVec, yVec, mTitle=" ", xLabel=" ", yLabel=" "):
             colorscale='Viridis',
             line_width=1
         )
-    ))
+    )
+    )
 
-    fig.show()
+    # Set title
+    fig.update_layout(
+        title_text=mTitle,
+        title_font_size=30
+    )
+
+    # Set x-axis title
+    fig.update_xaxes(
+        title_text=xLabel,
+        title_font_size=18)
+
+    # Set y-axes titles
+    fig.update_yaxes(
+        title_text=yLabel,
+        title_font_size=15)
+
+    # fig.show()
+
+    return fig
 
 
 def prediction(mtim, mdat, ptim, real, pred, ci):

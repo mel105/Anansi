@@ -350,7 +350,7 @@ class config:
 
     def getLinearity(self):
         """
-        Prepinatko: True, chcem zobrazit pomer UfG a Toku a pozriet sa na scatter, kde je zobrazeny vztach 
+        Prepinatko: True, chcem zobrazit pomer UfG a Toku a pozriet sa na scatter, kde je zobrazeny vztach
         medzi datami
 
         Returns
@@ -360,6 +360,19 @@ class config:
         """
 
         return self._linearity
+
+    def getGroups(self):
+        """
+        Prepinatko: True, chcem analyzovat data podla skupin, naprp. YOY (year over year) alebo WOW (week
+        over week)
+
+        Returns
+        -------
+        None.
+
+        """
+
+        return self._groups
 
     ###################################################################################################
     # protected funkcie
@@ -418,4 +431,5 @@ class config:
         self._descVerbosity = cf["setDescriptive"]["verbosity"]
 
         # nacitanie nastavenia linearity, t.j. zobrazenie ufg vs. flow
-        self._linearity = cf["setLinearity"]["linearity"]
+        self._linearity = cf["setVisualisations"]["linearity"]
+        self._groups = cf["setVisualisations"]["groups"]
