@@ -27,7 +27,7 @@ import lib.validation as vl
 import lib.descriptive as ds
 import lib.charts as cha
 import lib.visualRelations as rel
-# import lib.visualGroups as grp
+import lib.visualGroups as grp
 import lib.support as sp
 
 
@@ -49,12 +49,12 @@ def run():
     # Vygenerovanie obrazkov, kde sa zobrazuju vztahy medzi ufg a tokom
     if confObj.getLinearity():
 
-        rel.linearity(confObj, decObj)
+        rel.visualRelations(confObj, decObj)
 
     # Vygenerovanie obrazkov, kde sa analyzuju data napr. z pohladu rocny, ci tyzdennych priemerov
-    # if confObj.getGroups():
+    if confObj.getGroups():
 
-    #    grp.visualGrups(confObj, decObj)
+        grp.visualGroups(confObj, decObj)
 
     # Analyza kazdej jednej nezavislej premennej, kazdej jednej rady, ktora vstupuje do modelu
     # 1. Statisticky opis rady
@@ -158,10 +158,10 @@ def run():
     # Metriky vyhladenych dat
     # mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
     """
-    return decObj  # , modelObj, confObj
+    return decObj, confObj  # , modelObj, confObj
 
 
 # Spustenie spracovania dat
 if __name__ == "__main__":
-    data = run()
+    data, config = run()
     # data, model, config = run()

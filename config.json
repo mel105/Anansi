@@ -41,7 +41,7 @@
                   "validchart":1
     },
     "setVisualisations":{
-                "linearity":0,
+                "relations":0,
                 "groups":1
     },
     "setStations":{

@@ -494,56 +494,20 @@ def multilineChart(df, xLabel=" ", yLabel=" ", title=" "):
 
     _, b = df.shape
 
-    for i in range(1, b):
-        fig.add_trace(go.Scatter(x=df["DATE"], y=df[df.columns[i]], mode='lines', name=df.columns[i],
-                                 line=dict(width=2), connectgaps=True, ))
+    for s in df.columns:
+        fig.add_trace(go.Scatter(x=df["DATE"],
+                                 y=df[s],
+                                 name=s,
+                                 fill=None))
+    # for i in range(1, b):
+    #    fig.add_trace(go.Scatter(x=df["DATE"], y=df[df.columns[i]], name=df.columns[i]))
 
+    # line=dict(width=2), connectgaps=True,
     fig.update_layout(
 
         title=title,
         xaxis_title=xLabel,
         yaxis_title=yLabel,
-
-        xaxis=dict(
-            showline=True,
-            showgrid=False,
-            showticklabels=True,
-            linecolor='rgb(204, 204, 204)',
-            linewidth=2,
-            ticks='outside',
-            tickfont=dict(
-                family='Arial',
-                size=12,
-                color='rgb(82, 82, 82)',
-            ),
-        ),
-        yaxis=dict(
-            showgrid=True,
-            zeroline=True,
-            showline=True,
-            showticklabels=True,
-        ),
-        autosize=False,
-        width=1000,
-        height=500,
-        margin=dict(
-            l=50,
-            r=50,
-            b=100,
-            t=100,
-            pad=4
-        ),
-
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1
-        ),
-
-        showlegend=True,
-        plot_bgcolor='white'
     )
 
     fig.show()

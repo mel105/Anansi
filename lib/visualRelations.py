@@ -12,7 +12,7 @@ medzi skumanym parametrom a nezavyslymmi parametrami
 import lib.charts as charts
 
 
-class linearity:
+class visualRelations:
 
     def __init__(self, config, decoder):
 
@@ -24,7 +24,7 @@ class linearity:
         saveFigPath = config.getOutLocalPath()+"/"+config.getFigFolderName()
 
         # ostranenie stlpcov, ktore nechcem, aby som medzi sebou porovnaval
-        d.drop(columns=["DATE", "TOTAL NB"])
+        d = d.drop(columns=["DATE", "TOTAL NB"])
 
         # for cyklus cez vsetky stanice
         for (station, flow) in d.iteritems():

@@ -431,5 +431,5 @@ class config:
         self._descVerbosity = cf["setDescriptive"]["verbosity"]
 
         # nacitanie nastavenia linearity, t.j. zobrazenie ufg vs. flow
-        self._linearity = cf["setVisualisations"]["linearity"]
+        self._linearity = cf["setVisualisations"]["relations"]
         self._groups = cf["setVisualisations"]["groups"]
