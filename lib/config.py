@@ -374,6 +374,19 @@ class config:
 
         return self._groups
 
+    def getVerbosityLSQ(self):
+        """
+        Vrati koeficient verbosity pre printy na plochu. 0 - nic nevypisuj. 1 - Len strucne info (asi koef a
+        stredne hodnoty, pripadne aj vysledky vyrovnania a 2 - podrobne info)
+
+        Returns
+        -------
+        None.
+
+        """
+
+        return self._verLSQ
+
     ###################################################################################################
     # protected funkcie
 
@@ -405,6 +418,7 @@ class config:
         # prevezme nastavenie tykajuce sa Metody najmensich stvorcov
         self._maxIter = cf["setLSQ"]["maxIter"]
         self._epsVal = cf["setLSQ"]["epsVal"]
+        self._verLSQ = cf["setLSQ"]["verbosity"]
 
         # prevezme nastavenie tykajcue sa spracovania modelu
         self._alternativeModel = cf["setModel"]["alternativeModel"]

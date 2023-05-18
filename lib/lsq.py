@@ -68,6 +68,7 @@ def processLSQ(data, lVec, W, presFitStat, listOfStations, confObj):
     maxIter = int(confObj.getMaxIter())
     epsVal = float(confObj.getEpsVal())
     stopFitCrit = True
+    verb = confObj.getVerbosityLSQ()
 
     if confObj.getAddIntercept():
 
@@ -83,32 +84,25 @@ def processLSQ(data, lVec, W, presFitStat, listOfStations, confObj):
         numIter = numIter + 1
 
         # model
-        # valVec = np.array(model(initCoef, data, confObj.getAddIntercept()))
         modelObj = md.model(initCoef, data, confObj.getAddIntercept())
+
+        # val calc
         valVec = modelObj.estimation()
         valVec = np.array(valVec)
 
         resVec = lVec-valVec.reshape((-1, 1))
 
         # Design matrix
-        # A = derivative(data, confObj.getAddIntercept())
         A = modelObj.derivative()
 
         # LSQ
         Qvv, coef, dh, N = lsqAlg(A, initCoef, resVec, W)
 
         # val est
-        # valEst = np.array(model(coef, data, confObj.getAddIntercept()))
         modelObj = md.model(coef, data, confObj.getAddIntercept())
         valEst = np.array(modelObj.estimation())
 
-        # odhad rozdielov
-        # resEst = lVec-valEst.reshape((-1, 1))
-
         initCoef = coef
-
-        # print(f"   ***   Norma(dh) v pripade LSQ: {np.linalg.norm(dh):.2f}")
-        # print(f"   ***   Summa(val-est) v pripade LSQ: {np.sum(resEst):.2f}")
 
         if confObj.getAddIntercept():
             if np.linalg.norm(dh[1, :]) <= epsVal:
@@ -120,20 +114,18 @@ def processLSQ(data, lVec, W, presFitStat, listOfStations, confObj):
         if numIter == maxIter:
             stopFitCrit = False
 
-        # statistiky porovnania modelu a dat.
-        rmse, mae, bias, sumError = mt.metrics(lVec, valEst)
-        # print(
-        #     f"RMSE: {rmse: 0.2f}/MAE: {mae: 0.2f}/BIAS: {bias: 0.2f}/SUMA: {sumError[0]: .2f}")
-
         if presFitStat:
 
             # statistiky po vyrovnani modelu
-            summary(lVec, valEst,  listOfStations, A, dh, Qvv, N, coef, probup)
+            summary(lVec, valEst,  listOfStations, A, dh, Qvv, N, coef, probup, confObj)
 
-    return coef, A, dh, Qvv, N, valEst
+    # Metriky vyrovnania.
+    rmse, mae, bias, sumError = mt.metrics(lVec, valEst, confObj.getVerbosityLSQ())
+
+    return coef, A, dh, Qvv, N, valEst, modelObj.losses()
 
 
-def summary(lVec, eVec, stations, A, dh, Qvv, N, coef, probup):
+def summary(lVec, eVec, stations, A, dh, Qvv, N, coef, probup, conf):
     """
     funkcia vrati statistiky na zaklade rozdielu medzi datami a vyrovnanym modelom
 
@@ -143,20 +135,30 @@ def summary(lVec, eVec, stations, A, dh, Qvv, N, coef, probup):
 
     """
 
-    print("\n\n       LSQ SUMMARY:      ")
-    print("-----------------------------")
+    verb = conf.getVerbosityLSQ()
 
-    print(f"Number of parameters:   {len(dh)}")
-    print(f"Number of epochs:       {len(lVec)}")
-    print(f"Degree of freedom:     {len(lVec) - len(dh) - 1}")
+    if verb != 0:
+
+        print("\n\n       LSQ SUMMARY:      ")
+        print("-----------------------------")
+
+        print(f"Number of parameters:   {len(dh)}")
+        print(f"Number of epochs:       {len(lVec)}")
+        print(f"Degree of freedom:     {len(lVec) - len(dh) - 1}")
 
     # vektor oprav
     v = np.matmul(A, dh) - (lVec-eVec.reshape((-1, 1)))
-    print(f"\n\nSuma oprav je {float(sum(v)): .2f}")
+
+    if verb != 0:
+
+        print(f"\n\nSuma oprav je {float(sum(v)): .2f}")
 
     # jednotkova stredna chyba m0
     m0 = np.sqrt(np.matmul(np.transpose(v), v) / (len(v) - len(dh)))
-    print(f"Jednotkova stredna chyba je {float(m0): .2f}")
+
+    if verb != 0:
+
+        print(f"Jednotkova stredna chyba je {float(m0): .2f}")
 
     # stredne chyby neznamych parametrov
     mC = m0 * np.sqrt(np.diag(Qvv))
@@ -187,22 +189,43 @@ def summary(lVec, eVec, stations, A, dh, Qvv, N, coef, probup):
     dof = len(lVec) - len(dh) - 1
     tcrit = critTStat(probup, dof)
 
-    print("\nOdhad koeficientov:\n")
-    print(f"Kriticka hodnota t-statistiky {tcrit: .2f}")
-    # priprava tabulky na tlac
+    # Output
+    outPath = conf.getOutLocalPath()+"/"+conf.getCsvFolderName()
+
+    # Priprava tabulky na tlac
     table = []
-    for i in range(len(initCoef)):
-        row = [stations[i], initCoef[i], std[i], mC[i], tstat[i], pval[i], islow[i], isup[i]]
-        table.append(row)
+    header = []
 
-    header = ["Station", "Coef", "Standardized Coef", "Standard Deviation",
-              "t-stat", "p-val", "Lower Bound", "Upper Bound"]
+    if verb == 0:
 
-    print(tabulate(table,
-                   headers=header,
-                   tablefmt="outline"))
+        print("Warning: For printing and saving the results, please configure verbosity in setLSQ setting. \
+              Then some results well be saved in {0} folder".format(outPath))
 
-    with open('results.csv', 'w', encoding='UTF8') as f:
+    elif verb == 1:
+
+        for i in range(len(initCoef)):
+
+            row = [stations[i], initCoef[i], std[i], mC[i]]
+            table.append(row)
+
+        header = ["Station", "Coef", "Standardized Coef", "Standard Deviation"]
+
+        print(tabulate(table, headers=header, tablefmt="outline"))
+    else:
+
+        print("\nOdhad koeficientov:\n")
+        print(f"Kriticka hodnota t-statistiky {tcrit: .2f}")
+
+        for i in range(len(initCoef)):
+            row = [stations[i], initCoef[i], std[i], mC[i], tstat[i], pval[i], islow[i], isup[i]]
+            table.append(row)
+
+        header = ["Station", "Coef", "Standardized Coef", "Standard Deviation", "t-stat", "p-val",
+                  "Lower Bound", "Upper Bound"]
+
+        print(tabulate(table, headers=header, tablefmt="outline"))
+
+    with open(outPath + "/" + "results.csv", 'w', encoding='UTF8') as f:
         writer = csv.writer(f)
 
         # write the header
@@ -211,14 +234,10 @@ def summary(lVec, eVec, stations, A, dh, Qvv, N, coef, probup):
         # write the data
         writer.writerow(table)
 
-    np.savetxt("results2.csv",
+    np.savetxt(outPath + "/" + "results2.csv",
                table,
                delimiter=", ",
                fmt='% s')
-
-    # print(
-    #    f" Odhady [{i}]: {initCoef[i]: .5f}  {mC[i]: .5f}  {islow[i]: .5f}  {isup[i]: .5f}\
-    # {tstat[i]:.5f}  {pval[i]:.5f} -->> {stations[i-1]}")
 
 
 def standardCoef(coef, lVec, A):

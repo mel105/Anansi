@@ -16,7 +16,8 @@
     },
     "setLSQ":{
             "maxIter":50,
-            "epsVal":0.001
+            "epsVal":0.001, 
+            "verbosity":1
     },
     "setModel":{
             "alternativeModel":0,
@@ -42,7 +43,7 @@
     },
     "setVisualisations":{
                 "relations":0,
-                "groups":1
+                "groups":0
     },
     "setStations":{
             "stations": [

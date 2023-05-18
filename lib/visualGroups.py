@@ -20,9 +20,11 @@ class visualGroups:
         WE = decoder.getDFWeekly()
 
         # vyrobenie grafu: Casove rady po staniciach
-        self._visualStations(YE)
-        self._visualStations(MO)
-        self._visualStations(WE)
+        # self._visualStations(YE)
+        # self._visualStations(MO)
+        # self._visualStations(WE)
+
+        # heat mapy, na ktorych zobrazujem tyzdenne, mesacne a rocne priemery.
 
     def _visualStations(self, df):
 

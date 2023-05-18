@@ -13,7 +13,7 @@ from tabulate import tabulate
 # import lib.plotter as plot
 
 
-def metrics(refVec, estVec):
+def metrics(refVec, estVec, verb):
     """
     Funkcia vypise suhrn odhadovanych metrik, ktore sa tykaju pmErrornosti medzi modelom a orig
     datmi
@@ -32,7 +32,7 @@ def metrics(refVec, estVec):
 
     """
 
-    mError = refVec - estVec
+    mError = (refVec - estVec).reshape(-1, 1)
 
     # ###### STATISTIKY, KTORE SA TYKAJU OPISU CHYB MEDZI REF. A ODHADOVANYM SUBOROM DAT ######
     # RMSE
@@ -67,19 +67,22 @@ def metrics(refVec, estVec):
 
     # ######## VYPIS NA PLOCHU. SUBOR METRIK OBSAHUJE AK KVANTILY ROZDELENIA ##########
     # tabulka na plochu
-    print("\nOdhad metrik:\n")
 
-    table = [
-        ["MIN", np.quantile(mError, 0.00)],
-        ["Q25", np.quantile(mError, 0.25)],
-        ["Q50", np.quantile(mError, 0.50)],
-        ["Q75", np.quantile(mError, 0.75)],
-        ["MAX", np.quantile(mError, 1.00)],
-        ["RMS", rmse],
-        ["MAE", mae],
-        ["BIAS", bias],
-        ["SUME", sumaError]]
+    if verb != 0:
 
-    print(tabulate(table, headers=["Statistics", "Estimation"], tablefmt="outline", floatfmt=".7f"))
+        print("\nOdhad metrik:\n")
+
+        table = [
+            ["MIN", np.quantile(mError, 0.00)],
+            ["Q25", np.quantile(mError, 0.25)],
+            ["Q50", np.quantile(mError, 0.50)],
+            ["Q75", np.quantile(mError, 0.75)],
+            ["MAX", np.quantile(mError, 1.00)],
+            ["RMS", rmse],
+            ["MAE", mae],
+            ["BIAS", bias],
+            ["SUME", sumaError]]
+
+        print(tabulate(table, headers=["Statistics", "Estimation"], tablefmt="outline", floatfmt=".7f"))
 
     return rmse, mae, bias, sumaError

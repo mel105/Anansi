@@ -60,10 +60,10 @@ def run():
     # 1. Statisticky opis rady
     # ds.descriptive(confObj, decObj)
 
-    """
     # Spracovanie modelu. Polozka 0 v hore preddefinovanom zozname uloh.
     modelObj = prc.processModel(confObj, decObj)
 
+    """
     # Ak je pozadovane, aby bola vykonana zhodnotenie modelu pomocou metrik
     # Je potreba doplnit R2 a celkovo precistit metriky
 
@@ -158,10 +158,10 @@ def run():
     # Metriky vyhladenych dat
     # mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
     """
-    return decObj, confObj  # , modelObj, confObj
+    return decObj, confObj, modelObj
 
 
 # Spustenie spracovania dat
 if __name__ == "__main__":
-    data, config = run()
-    # data, model, config = run()
+
+    data, config, model = run()

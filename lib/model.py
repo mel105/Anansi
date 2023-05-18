@@ -10,6 +10,7 @@ Trieda vrati hodnoty modelu, tak aj potrebne prve derivacie.
 """
 
 import numpy as np
+import pandas as pd
 
 
 class model:
@@ -54,6 +55,17 @@ class model:
             self._val = []
 
     # get functions
+    def losses(self):
+        """
+        Funkcia vrati odhad stat v podobe DataFrame. Potreba doplnit header a pripadne time column ako index.
+
+        Returns
+        -------
+        None.
+
+        """
+        return pd.DataFrame(self._loss)
+
     def estimation(self):
         """
         Funkcia vrati odhadnute hodnoty modelu
@@ -108,22 +120,34 @@ class model:
 
         # prenasobenie koeficientov tokmi: mu + A*kA + B*kB + C*kC = model
         self._val = []
+        self._loss = []
 
         if inter:
 
             for i in range(len(inp)):
+
                 tmp = float(coef[0])
+                arr = np.empty(len(coef), dtype=float)
+                arr[0] = float(coef[0])
 
                 for j in range(len(coef)-1):
-                    # print(i, j, tmp, coef[0])
-                    tmp += float(coef[j+1])*float(inp[i, j])
+
+                    ls = float(coef[j+1])*float(inp[i, j])
+                    # print(i, j, coef[j+1], inp[i, j], ls)
+                    # tmp += float(coef[j+1])*float(inp[i, j])
+                    arr[j] = ls
+                    tmp += ls
 
                 self._val.append(tmp)
+                self._loss.append(arr)
         else:
 
             for i in range(len(inp)):
+
                 tmp = 0
+
                 for j in range(len(coef)):
+
                     # print(" f.2%   f.2%", i, j)
                     tmp += coef[j]*float(inp[i, j])
 

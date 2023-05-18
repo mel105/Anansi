@@ -172,6 +172,17 @@ class processModel:
 
         return self._df["DATE"]
 
+    def getLosses(self):
+        """
+        Metoda vrati straty rozpocitane po case a staniciam
+
+        Returns
+        -------
+        None.
+
+        """
+        return self._loss
+
     # PROTECTED FUNKCIE
     def _dataProcessing(self):
         """
@@ -198,8 +209,8 @@ class processModel:
             [nrows, ncols] = self._data.shape
 
             # Algoritmus LSQ vyrovnania
-            coef, A, dh, Qvv, N, valEst = lsq.processLSQ(self._data, self._lVec, self._weightVec,
-                                                         calcFitStat, self._listOfStations, self._conf)
+            coef, A, dh, Qvv, N, valEst, losses = lsq.processLSQ(self._data, self._lVec, self._weightVec,
+                                                                 calcFitStat, self._listOfStations, self._conf)
 
             """
             # K uvahe. Tu by mohla nasledovat procedura, v ktorej prebehne:
@@ -235,12 +246,29 @@ class processModel:
         # Celkove calc UfG
         self._valEst = valEst
 
+        # Rozpocitane straty podla koeficientov a tokov v kazdom case
+        header = self._conf.getOutStations()
+
+        # if "Constant" in header:
+        #    header.pop(0)
+
+        losses.columns = header
+        self._loss = losses
+        print(self._loss)
+
         # Statistiky po vyrovnani modelu
-        lsq.summary(self._lVec, self._valEst, self._listOfStations, A, dh,  Qvv, N, coef.T, self._probUp)
+        lsq.summary(self._lVec, self._valEst, self._listOfStations, A, dh,  Qvv, N, coef.T, self._probUp,
+                    self._conf)
 
         # Alternative model
-        altObj = alm.alternativeModel(coef, self._data, self._conf.getAddIntercept(),
-                                      self._conf.getLimitRelativeUfG())
+        if self._conf.getAlternativeModel():
 
-        self._valAlt = altObj.getAltModel()
-        self._coefAlt = altObj.getAltCoef()
+            altObj = alm.alternativeModel(coef, self._data, self._conf.getAddIntercept(),
+                                          self._conf.getLimitRelativeUfG())
+
+            self._valAlt = altObj.getAltModel()
+            self._coefAlt = altObj.getAltCoef()
+        else:
+
+            self._valAlt = []
+            self._coefAlt = []
