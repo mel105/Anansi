@@ -17,6 +17,8 @@ Postupne by tento skript ma zastresit tieto ukony:
 """
 
 import pandas as pd
+import numpy as np
+import math
 import lib.config as cfg
 import lib.processModel as prc
 import lib.smoothSeries as smt
@@ -29,6 +31,96 @@ import lib.charts as cha
 import lib.visualRelations as rel
 import lib.visualGroups as grp
 import lib.support as sp
+import lib.supportSSA as spssa
+
+
+def testSSA():
+    """
+    Funkcia otestuje SSA pre ucel vyhladenia UFG
+
+    Returns
+    -------
+    None.
+
+    """
+
+    print("TEST SSA Algoritmu")
+
+    # Vygenerovanie umelej casovej rady
+    N = 200  # The number of time 'moments' in our toy series
+    t = np.arange(0, N)
+    trend = 0.001 * (t - 100)**2
+    p1, p2 = 20, 30
+    periodic1 = 2 * np.sin(2*math.pi*t/p1)
+    periodic2 = 0.75 * np.sin(2*math.pi*t/p2)
+
+    np.random.seed(123)  # So we generate the same noisy time series every time.
+    noise = 2 * (np.random.rand(N) - 0.5)
+    F = trend + periodic1 + periodic2 + noise
+
+    # vykreslenie casovej rady
+    # cha.generalPlot(t, F, trend, periodic1, periodic2, noise)
+
+    # Trajectory matrix
+    L = 70  # The window length.
+    K = N - L + 1  # The number of columns in the trajectory matrix.
+    # Create the trajectory matrix by pulling the relevant subseries of F, and stacking them as columns.
+    X = np.column_stack([F[i:i+L] for i in range(0, K)])
+    # Note: the i+L above gives us up to i+L-1, as numpy array upper bounds are exclusive.
+
+    # cha.trajectoryMatrix(X)
+
+    # Decomposition of trajectory matrix
+    d = np.linalg.matrix_rank(X)  # The intrinsic dimensionality of the trajectory space.
+
+    # For those interested in how to code up an SVD calculation, Numerical Recipes in Fortran 77
+    # has you covered: http://www.aip.de/groups/soe/local/numres/bookfpdf/f2-6.pdf
+    # Thankfully, we'll leave the actual SVD calculation to NumPy.
+    U, Sigma, V = np.linalg.svd(X)
+    V = V.T  # Note: the SVD routine returns V^T, not V, so I'll tranpose it back here. This may seem pointles
+    # but I'll treat the Python representation of V consistently with the mathematical notation in this notebo
+
+    # Calculate the elementary matrices of X, storing them in a multidimensional NumPy array.
+    # This requires calculating sigma_i * U_i * (V_i)^T for each i, or sigma_i * outer_product(U_i, V_i).
+    # Note that Sigma is a 1D array of singular values, instead of the full L x K diagonal matrix.
+    X_elem = np.array([Sigma[i] * np.outer(U[:, i], V[:, i]) for i in range(0, d)])
+
+    # Quick sanity check: the sum of all elementary matrices in X_elm should be equal to X, to within a
+    # *very small* tolerance:
+    if not np.allclose(X, X_elem.sum(axis=0), atol=1e-10):
+        print("WARNING: The sum of X's elementary matrices is not equal to X!")
+
+    # zobrazenie prvych 12 elem matic
+    n = min(12, d)
+
+    # cha.elementaryMatrices(n, X_elem)
+
+    sigma_sumsq = (Sigma**2).sum()
+
+    # cha.contributionPlot(Sigma, sigma_sumsq)
+
+    # Time series rekonstruction
+    cha.hankeliseMatrices(n, X_elem)
+
+    # zobrazenie prvych n komponent
+    cha.plotNcomponents(t, F, X_elem, n)
+
+    # zlepenie komponent dokopy: Tu to bude chciet nejak zautomatizovat
+    # Assemble the grouped components of the time series.
+    F_trend = spssa.X_to_TS(X_elem[[0, 1, 6]].sum(axis=0))
+    F_periodic1 = spssa.X_to_TS(X_elem[[2, 3]].sum(axis=0))
+    F_periodic2 = spssa.X_to_TS(X_elem[[4, 5]].sum(axis=0))
+    F_noise = spssa.X_to_TS(X_elem[7:].sum(axis=0))
+
+    cha.generalReconstruction(t, F, F_trend, F_periodic1, F_periodic2, F_noise)
+
+    # A list of tuples so we can create the next plot with a loop.
+    components = [("Trend", trend, F_trend),
+                  ("Periodic 1", periodic1, F_periodic1),
+                  ("Periodic 2", periodic2, F_periodic2),
+                  ("Noise", noise, F_noise)]
+
+    cha.plotComponents(t, F, components)
 
 
 def run():
@@ -164,4 +256,5 @@ def run():
 # Spustenie spracovania dat
 if __name__ == "__main__":
 
-    data, config, model = run()
+    # data, config, model = run()
+    testSSA()

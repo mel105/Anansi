@@ -20,9 +20,295 @@ import plotly.io as pio
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import matplotlib
+import lib.supportSSA as spssa
+from cycler import cycler
 
 matplotlib.use("WebAgg")
 pio.renderers.default = "browser"
+
+
+def plotComponents(t, F, components):
+    """
+    Porovnanie komponetov
+
+    Parameters
+    ----------
+    t : TYPE
+        DESCRIPTION.
+    F : TYPE
+        DESCRIPTION.
+    components : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
+
+    # Plot the separated components and original components together.
+    fig = plt.figure()
+    n = 1
+    for name, orig_comp, ssa_comp in components:
+        ax = fig.add_subplot(2, 2, n)
+        ax.plot(t, orig_comp, linestyle="--", lw=2.5, alpha=0.7)
+        ax.plot(t, ssa_comp)
+        ax.set_title(name, fontsize=16)
+        ax.set_xticks([])
+        n += 1
+
+    fig.tight_layout()
+
+
+def generalReconstruction(t, F, F_trend, F_periodic1, F_periodic2, F_noise):
+    """
+    Obecne zobrazenie Orig rady a rekonstruovanych komponent
+
+    Parameters
+    ----------
+    t : TYPE
+        DESCRIPTION.
+    F : TYPE
+        DESCRIPTION.
+    F_trend : TYPE
+        DESCRIPTION.
+    F_periodic1 : TYPE
+        DESCRIPTION.
+    F_periodic2 : TYPE
+        DESCRIPTION.
+    F_noise : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
+
+    # Plot the toy time series and its separated components on a single plot.
+    plt.plot(t, F, lw=1)
+    plt.plot(t, F_trend)
+    plt.plot(t, F_periodic1)
+    plt.plot(t, F_periodic2)
+    plt.plot(t, F_noise, alpha=0.5)
+    plt.xlabel("$t$")
+    plt.ylabel(r"$\tilde{F}^{(j)}$")
+    groups = ["trend", "periodic 1", "periodic 2", "noise"]
+    legend = ["$F$"] + [r"$\tilde{F}^{(\mathrm{%s})}$" % group for group in groups]
+    plt.legend(legend)
+    plt.title("Grouped Time Series Components")
+
+    plt.show()
+
+
+def plotNcomponents(t, F, X_elem, n):
+    """
+    Funkcia vykresli prvych N komponet
+
+    Parameters
+    ----------
+    t : TYPE
+        DESCRIPTION.
+    F : TYPE
+        DESCRIPTION.
+    X_elem : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
+
+    # Fiddle with colour cycle - need more colours!
+    fig = plt.subplot()
+
+    color_cycle = cycler(color=plt.get_cmap('tab20').colors)
+    fig.axes.set_prop_cycle(color_cycle)
+
+    # Convert elementary matrices straight to a time series - no need to construct any Hankel matrices.
+    for i in range(n):
+        F_i = spssa.X_to_TS(X_elem[i])
+        fig.axes.plot(t, F_i, lw=2)
+
+    fig.axes.plot(t, F, alpha=1, lw=1)
+
+    fig.set_xlabel("$t$")
+    fig.set_ylabel(r"$\tilde{F}_i(t)$")
+
+    legend = [r"$\tilde{F}_{%s}$" % i for i in range(n)] + ["$F$"]
+
+    fig.set_title("The First 12 Components of the Toy Time Series")
+    fig.legend(legend, loc=(1.05, 0.1))
+
+    plt.show()
+
+
+def generalPlot(t, F, trend, periodic1, periodic2, noise):
+    """
+    Funkcia zobrazi generovanu casovu radu
+
+    Parameters
+    ----------
+    t : TYPE
+        DESCRIPTION.
+    F : TYPE
+        DESCRIPTION.
+    trend : TYPE
+        DESCRIPTION.
+    periodic1 : TYPE
+        DESCRIPTION.
+    periodic2 : TYPE
+        DESCRIPTION.
+    noise : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
+
+    plt.plot(t, F, lw=2.5)
+    plt.plot(t, trend, alpha=0.75)
+    plt.plot(t, periodic1, alpha=0.75)
+    plt.plot(t, periodic2, alpha=0.75)
+    plt.plot(t, noise, alpha=0.5)
+    plt.legend(["Toy Series ($F$)", "Trend", "Periodic #1", "Periodic #2", "Noise"])
+    plt.xlabel("$t$")
+    plt.ylabel("$F(t)$")
+    plt.title("The Toy Time Series and its Components")
+
+    plt.show()
+
+
+def hankeliseMatrices(n, X_elem):
+    """
+    Funkcia zobrazi tzv. elementarne matice resp. ich n pocet
+
+    Parameters
+    ----------
+    n : TYPE
+        DESCRIPTION.
+    X_elem : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
+    for j in range(0, n):
+        plt.subplot(4, 4, j+1)
+        title = r"$\tilde{\mathbf{X}}_{" + str(j) + "}$"
+
+        plot_2d(spssa.hankelise(X_elem[j]), title)
+
+    plt.tight_layout()
+
+    plt.show()
+
+
+def elementaryMatrices(n, X_elem):
+    """
+    Funkcia zobrazi tzv. elementarne matice resp. ich n pocet
+
+    Parameters
+    ----------
+    n : TYPE
+        DESCRIPTION.
+    X_elem : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
+
+    for i in range(n):
+        plt.subplot(4, 4, i+1)
+        title = "$\mathbf{X}_{" + str(i) + "}$"
+        plot_2d(X_elem[i], title)
+        plt.tight_layout()
+
+    plt.show()
+
+
+def contributionPlot(Sigma, sigma_sumsq):
+    """
+    Funkcia zobrazi prinos jednotlivych komponent SSA algoritmu
+
+    Returns
+    -------
+    None.
+
+    """
+
+    fig, ax = plt.subplots(1, 2, figsize=(14, 5))
+    ax[0].plot(Sigma**2 / sigma_sumsq * 100, lw=2.5)
+    ax[0].set_xlim(0, 11)
+    ax[0].set_title("Relative Contribution of $\mathbf{X}_i$ to Trajectory Matrix")
+    ax[0].set_xlabel("$i$")
+    ax[0].set_ylabel("Contribution (%)")
+
+    ax[1].plot((Sigma**2).cumsum() / sigma_sumsq * 100, lw=2.5)
+    ax[1].set_xlim(0, 11)
+    ax[1].set_title("Cumulative Contribution of $\mathbf{X}_i$ to Trajectory Matrix")
+    ax[1].set_xlabel("$i$")
+    ax[1].set_ylabel("Contribution (%)")
+
+    plt.show()
+
+
+def plot_2d(m, title=""):
+    """
+    Funkcia zobrazi 2D plot
+
+    Parameters
+    ----------
+    m : TYPE
+        DESCRIPTION.
+    title : TYPE, optional
+        DESCRIPTION. The default is "".
+
+    Returns
+    -------
+    None.
+
+    """
+
+    plt.imshow(m)
+    plt.xticks([])
+    plt.yticks([])
+    plt.title(title)
+
+    # plt.show()
+
+
+def trajectoryMatrix(X):
+    """
+    Funkcia zobrazi tzv. trajectory matrix
+
+    Parameters
+    ----------
+    F : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
+
+    ax = plt.matshow(X)
+    plt.xlabel("$L$-Lagged Vectors")
+    plt.ylabel("$K$-Lagged Vectors")
+    plt.colorbar(ax.colorbar, fraction=0.025)
+    ax.colorbar.set_label("$F(t)$")
+    plt.title("The Trajectory Matrix for the Toy Time Series")
+
+    plt.show()
 
 
 def lineBarPlot(tVec, xVec, yVec, mTitle=" ", xLabel=" ", yLabel=" ", y2Label=" "):
