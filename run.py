@@ -19,6 +19,8 @@ Postupne by tento skript ma zastresit tieto ukony:
 import pandas as pd
 import numpy as np
 import math
+import matplotlib.pyplot as plt
+
 import lib.config as cfg
 import lib.processModel as prc
 import lib.smoothSeries as smt
@@ -32,7 +34,7 @@ import lib.visualRelations as rel
 import lib.visualGroups as grp
 import lib.support as sp
 import lib.supportSSA as spssa
-
+import lib.SSA as ssa
 
 def testSSA():
     """
@@ -112,7 +114,7 @@ def testSSA():
     F_periodic2 = spssa.X_to_TS(X_elem[[4, 5]].sum(axis=0))
     F_noise = spssa.X_to_TS(X_elem[7:].sum(axis=0))
 
-    cha.generalReconstruction(t, F, F_trend, F_periodic1, F_periodic2, F_noise)
+    # cha.generalReconstruction(t, F, F_trend, F_periodic1, F_periodic2, F_noise)
 
     # A list of tuples so we can create the next plot with a loop.
     components = [("Trend", trend, F_trend),
@@ -120,8 +122,35 @@ def testSSA():
                   ("Periodic 2", periodic2, F_periodic2),
                   ("Noise", noise, F_noise)]
 
-    cha.plotComponents(t, F, components)
+    # cha.plotComponents(t, F, components)
+    
+    # Tu je cast kodu, kde je pouzita trieda SSA a kde sa diskutuje automaticke 
+    # rozodnutie, ktore komponenty ako grupovat.
+    
+    F_ssa_L2 = ssa.SSA(F, 20)
+    F_ssa_L2.components_to_df().plot()
+    F_ssa_L2.orig_TS.plot(alpha=0.4)
+    plt.xlabel("$t$")
+    plt.ylabel(r"$\tilde{F}_i(t)$")
+    plt.title(r"$L=2$ for the Toy Time Series");
+    plt.show()
+    
+    F_ssa_L2.plot_wcorr()
+    plt.title("W-Correlation for Toy Time Series, $L=20$");
+    plt.show()
 
+    F_ssa_L2.reconstruct(0).plot()
+    F_ssa_L2.reconstruct([1,2,3]).plot()
+    F_ssa_L2.reconstruct(slice(4,20)).plot()
+    F_ssa_L2.reconstruct(3).plot()
+    plt.xlabel("$t$")
+    plt.ylabel(r"$\tilde{F}_i(t)$")
+    plt.title("Component Groupings for Toy Time Series, $L=20$");
+    plt.legend([r"$\tilde{F}_0$", 
+            r"$\tilde{F}_1+\tilde{F}_2+\tilde{F}_3$", 
+            r"$\tilde{F}_4+ \ldots + \tilde{F}_{19}$",
+            r"$\tilde{F}_3$"]);
+    plt.show()
 
 def run():
 
