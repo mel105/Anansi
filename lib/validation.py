@@ -45,7 +45,7 @@ class validation:
 
             # pokial setEndTime > posledna hodnota v DF, potom nema zmysel robit nejaku predikciu
             if setEndTime >= lastTime:
-                
+
                 print("No Validation")
             else:
 
@@ -63,7 +63,10 @@ class validation:
                 pred = modelObj.estimation()
 
                 # pripravim si realne UFG
-                real = de["TOTAL NB"]
+                if config.getSmoothingMethod() == "SSA":
+                    real = de["TOTAL NB ORIG"]
+                else:
+                    real = de["TOTAL NB"]
 
                 # data na vystup
                 dfvalid = pd.DataFrame()
@@ -72,7 +75,7 @@ class validation:
                 dfvalid["REAL"] = real
 
                 # spocitam metriky
-                rmse, _, _, _ = mt.metrics(dfvalid.REAL.to_numpy(), dfvalid.PRED.to_numpy())
+                rmse, _, _, _ = mt.metrics(dfvalid.REAL.to_numpy(), dfvalid.PRED.to_numpy(), 1)
 
         else:
             print(config.gerPrediction())

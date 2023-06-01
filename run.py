@@ -36,6 +36,7 @@ import lib.support as sp
 import lib.supportSSA as spssa
 import lib.SSA as ssa
 
+
 def testSSA():
     """
     Funkcia otestuje SSA pre ucel vyhladenia UFG
@@ -65,6 +66,7 @@ def testSSA():
 
     # Trajectory matrix
     L = 70  # The window length.
+
     K = N - L + 1  # The number of columns in the trajectory matrix.
     # Create the trajectory matrix by pulling the relevant subseries of F, and stacking them as columns.
     X = np.column_stack([F[i:i+L] for i in range(0, K)])
@@ -102,10 +104,10 @@ def testSSA():
     # cha.contributionPlot(Sigma, sigma_sumsq)
 
     # Time series rekonstruction
-    cha.hankeliseMatrices(n, X_elem)
+    # cha.hankeliseMatrices(n, X_elem)
 
     # zobrazenie prvych n komponent
-    cha.plotNcomponents(t, F, X_elem, n)
+    # cha.plotNcomponents(t, F, X_elem, n)
 
     # zlepenie komponent dokopy: Tu to bude chciet nejak zautomatizovat
     # Assemble the grouped components of the time series.
@@ -123,34 +125,31 @@ def testSSA():
                   ("Noise", noise, F_noise)]
 
     # cha.plotComponents(t, F, components)
-    
-    # Tu je cast kodu, kde je pouzita trieda SSA a kde sa diskutuje automaticke 
-    # rozodnutie, ktore komponenty ako grupovat.
-    
-    F_ssa_L2 = ssa.SSA(F, 20)
-    F_ssa_L2.components_to_df().plot()
-    F_ssa_L2.orig_TS.plot(alpha=0.4)
-    plt.xlabel("$t$")
-    plt.ylabel(r"$\tilde{F}_i(t)$")
-    plt.title(r"$L=2$ for the Toy Time Series");
-    plt.show()
-    
-    F_ssa_L2.plot_wcorr()
-    plt.title("W-Correlation for Toy Time Series, $L=20$");
-    plt.show()
 
-    F_ssa_L2.reconstruct(0).plot()
-    F_ssa_L2.reconstruct([1,2,3]).plot()
-    F_ssa_L2.reconstruct(slice(4,20)).plot()
-    F_ssa_L2.reconstruct(3).plot()
-    plt.xlabel("$t$")
-    plt.ylabel(r"$\tilde{F}_i(t)$")
-    plt.title("Component Groupings for Toy Time Series, $L=20$");
-    plt.legend([r"$\tilde{F}_0$", 
-            r"$\tilde{F}_1+\tilde{F}_2+\tilde{F}_3$", 
-            r"$\tilde{F}_4+ \ldots + \tilde{F}_{19}$",
-            r"$\tilde{F}_3$"]);
-    plt.show()
+    # Tu je cast kodu, kde je pouzita trieda SSA a kde sa diskutuje automaticke
+    # rozodnutie, ktore komponenty ako grupovat.
+    L = 60
+    F_ssa = ssa.SSA(F, L)
+
+    cmpdf = F_ssa.components_to_df()
+
+    # F_ssa.orig_TS.plot(alpha=0.4)
+    # plt.xlabel("$t$")
+    # plt.ylabel(r"$\tilde{F}_i(t)$")
+    # plt.title(r"$L={0}$ for the Toy Time Series".format(L))
+
+    # plt.show()
+
+    mtitle = "W-Correlation for analysed Time Series, L=60"
+    F_ssa.plot_wcorr(mtitle)
+
+    # RECONSTRUCTION
+    sig = F_ssa.reconstruct(slice(0, 7))
+    noi = F_ssa.reconstruct(slice(8, 60))
+    org = F_ssa.orig_TS
+
+    cha.ssaPlot(t, org, sig, noi)
+
 
 def run():
 
@@ -167,6 +166,15 @@ def run():
     filePath = confObj.getInpFilePath()
     decObj = dc.decoder(fileName, filePath, confObj)
 
+    # Zobrazenie orig strat a vyhladenych strat, ak SSA je v nastaveni zvolena ako smoothed method.
+    if confObj.getSmoothingMethod() == "SSA":
+        cha.multilineChart(pd.DataFrame({"DATE": decObj.getDF()["DATE"],
+                                         "Original UfG": decObj.getDF()["TOTAL NB ORIG"],
+                                         "Smoothed UfG": decObj.getDF()["TOTAL NB"]}),
+                           title="Original and Smoothed real UfG comparision",
+                           xLabel="t (day)", yLabel="UfG [kWh]")
+
+    """
     # Vygenerovanie obrazkov, kde sa zobrazuju vztahy medzi ufg a tokom
     if confObj.getLinearity():
 
@@ -180,11 +188,11 @@ def run():
     # Analyza kazdej jednej nezavislej premennej, kazdej jednej rady, ktora vstupuje do modelu
     # 1. Statisticky opis rady
     # ds.descriptive(confObj, decObj)
+    """
 
     # Spracovanie modelu. Polozka 0 v hore preddefinovanom zozname uloh.
     modelObj = prc.processModel(confObj, decObj)
 
-    """
     # Ak je pozadovane, aby bola vykonana zhodnotenie modelu pomocou metrik
     # Je potreba doplnit R2 a celkovo precistit metriky
 
@@ -201,6 +209,7 @@ def run():
 
         vl.validation(confObj, decObj, modelObj)
 
+    """
     # ZAKOMENTOVANA CAST KODU FUNGUJE, ALE PRE TESTOVANIE VALIDACIE JU NEPOTREBUJEM.
 
     # vyhladenie realnych ufg dat a spocitanie relativnych ufg
@@ -279,11 +288,11 @@ def run():
     # Metriky vyhladenych dat
     # mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
     """
-    return decObj, confObj, modelObj
+    return decObj  # , confObj, modelObj
 
 
 # Spustenie spracovania dat
 if __name__ == "__main__":
 
-    # data, config, model = run()
-    testSSA()
+    data = run()
+    # testSSA()

@@ -8,6 +8,7 @@ Created on Fri Feb 10 17:02:49 2023
 
 import pandas as pd
 import numpy as np
+import lib.SSA as ssa
 
 
 class decoder:
@@ -45,6 +46,14 @@ class decoder:
         ri, ci = np.where(~boa)
         for i in range(len(ri)):
             self._df.loc[ri[i], self._df.columns[ci[i]]] = 0.0
+
+        # Vyhladenie TOTAL NB pomocou SSA algoritmu
+        if confObj.getSmoothingMethod() == "SSA":
+            F_ssa = ssa.SSA(self._df["TOTAL NB"], 360)
+            self._df["TOTAL NB ORIG"] = self._df["TOTAL NB"]
+            self._df["TOTAL NB"] = F_ssa.reconstruct(slice(0, 50))
+            print("\nWARNING: TOTAL NB was reconstructed by SSA algorithm. Please be carefull for \
+                  futher TOTAL NB parameter analysing\n")
 
         self._dfred = self._df
 

@@ -27,7 +27,7 @@
             "probUp": 0.975 
     },
     "setSmoothing":{
-                "smoothingMethod":"movingAverage",
+                "smoothingMethod":"SSA",
                 "smoothingBin":5,
                 "smoothingAlt": "center"
     },

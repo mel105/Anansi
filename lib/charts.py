@@ -27,6 +27,30 @@ matplotlib.use("WebAgg")
 pio.renderers.default = "browser"
 
 
+def ssaPlot(t, orig, reco, noise):
+    """
+    Funkcia vrati porovnanie originalneho a rekonstruovaneho signalu
+
+    """
+
+    fig = make_subplots(rows=2, cols=1, subplot_titles=("Analysed Time Series reconstruction", "Noise"))
+
+    fig.add_trace(go.Scatter(x=t, y=orig, name="Original series", mode="lines"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=t, y=reco, name="Reconstructed series", mode="lines"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=t, y=noise, name="Noise", mode="lines"), row=2, col=1)
+
+    fig.update_layout(
+
+        title_text="Original and Reconstructed Time Series comparision",
+        xaxis_title="t",
+        yaxis_title="X(t)",
+    )
+
+    fig.show()
+
+    return fig
+
+
 def plotComponents(t, F, components):
     """
     Porovnanie komponetov
@@ -46,9 +70,45 @@ def plotComponents(t, F, components):
 
     """
 
+    names = []
+    for name, _, _ in components:
+        names.append(name)
+
+    fig = make_subplots(rows=2, cols=2, subplot_titles=names)
+
+    n = 1
+    irow = 1
+    icol = 1
+    for name, orig_comp, ssa_comp in components:
+
+        if n == 1:
+            irow = 1
+            icol = 1
+        elif n == 2:
+            irow = 1
+            icol = 2
+        elif n == 3:
+            irow = 2
+            icol = 1
+        else:
+            irow = 2
+            icol = 2
+
+        fig.add_trace(go.Scatter(x=t, y=orig_comp, mode="lines",
+                      name="ORG"+name), row=irow, col=icol)
+        fig.add_trace(go.Scatter(x=t, y=ssa_comp, mode="lines",
+                      name="SSA"+name), row=irow, col=icol)
+
+        n += 1
+
+    fig.show()
+
+    """
     # Plot the separated components and original components together.
     fig = plt.figure()
+
     n = 1
+
     for name, orig_comp, ssa_comp in components:
         ax = fig.add_subplot(2, 2, n)
         ax.plot(t, orig_comp, linestyle="--", lw=2.5, alpha=0.7)
@@ -58,6 +118,9 @@ def plotComponents(t, F, components):
         n += 1
 
     fig.tight_layout()
+
+    fig.show()
+    """
 
 
 def generalReconstruction(t, F, F_trend, F_periodic1, F_periodic2, F_noise):
@@ -85,20 +148,43 @@ def generalReconstruction(t, F, F_trend, F_periodic1, F_periodic2, F_noise):
 
     """
 
-    # Plot the toy time series and its separated components on a single plot.
-    plt.plot(t, F, lw=1)
-    plt.plot(t, F_trend)
-    plt.plot(t, F_periodic1)
-    plt.plot(t, F_periodic2)
-    plt.plot(t, F_noise, alpha=0.5)
-    plt.xlabel("$t$")
-    plt.ylabel(r"$\tilde{F}^{(j)}$")
-    groups = ["trend", "periodic 1", "periodic 2", "noise"]
-    legend = ["$F$"] + [r"$\tilde{F}^{(\mathrm{%s})}$" % group for group in groups]
-    plt.legend(legend)
-    plt.title("Grouped Time Series Components")
+    fig = go.Figure()
 
-    plt.show()
+    fig.add_trace(go.Scatter(x=t, y=F, name="Generated Series ($F$)", mode='lines', line=dict(width=5),
+                             connectgaps=True, ))
+    fig.add_trace(go.Scatter(x=t, y=F_trend, name="Trend", mode="lines",
+                  line=dict(width=2.5), connectgaps=True, ))
+    fig.add_trace(go.Scatter(x=t, y=F_periodic1,  name="Periodic #1",
+                  mode="lines", line=dict(width=2.5), connectgaps=True, ))
+    fig.add_trace(go.Scatter(x=t, y=F_periodic2, name="Periodic #2",
+                  mode="lines", line=dict(width=2.5), connectgaps=True, ))
+    fig.add_trace(go.Scatter(x=t, y=F_noise, name="Noise", mode="lines",
+                  line=dict(width=2.5), connectgaps=True, ))
+
+    fig.update_layout(
+
+        title="Grouped Time Series Components",
+        xaxis_title="t",
+        yaxis_title="F(t)",
+    )
+
+    fig.show()
+
+    # return fig
+
+    # Plot the toy time series and its separated components on a single plot.
+    # plt.plot(t, F, lw=1)
+    # plt.plot(t, F_trend)
+    # plt.plot(t, F_periodic1)
+    # plt.plot(t, F_periodic2)
+    # plt.plot(t, F_noise, alpha=0.5)
+    # plt.xlabel("$t$")
+    # plt.ylabel(r"$\tilde{F}^{(j)}$")
+    # groups = ["trend", "periodic 1", "periodic 2", "noise"]
+    # legend = ["$F$"] + [r"$\tilde{F}^{(\mathrm{%s})}$" % group for group in groups]
+    # plt.legend(legend)
+    # plt.title("Grouped Time Series Components")
+    # plt.show()
 
 
 def plotNcomponents(t, F, X_elem, n):
@@ -120,28 +206,36 @@ def plotNcomponents(t, F, X_elem, n):
 
     """
 
-    # Fiddle with colour cycle - need more colours!
-    fig = plt.subplot()
+    fig = go.Figure()
 
-    color_cycle = cycler(color=plt.get_cmap('tab20').colors)
-    fig.axes.set_prop_cycle(color_cycle)
-
-    # Convert elementary matrices straight to a time series - no need to construct any Hankel matrices.
     for i in range(n):
+
         F_i = spssa.X_to_TS(X_elem[i])
-        fig.axes.plot(t, F_i, lw=2)
+        fig.add_trace(go.Scatter(x=t, y=F_i, name=r"$\tilde{F}_{%s}$" % i, line=dict(width=2)))
 
-    fig.axes.plot(t, F, alpha=1, lw=1)
+    fig.add_trace(go.Scatter(x=t, y=F, name="Generated Series ($F$)", mode='lines', line=dict(width=3),
+                             connectgaps=True, ))
 
-    fig.set_xlabel("$t$")
-    fig.set_ylabel(r"$\tilde{F}_i(t)$")
+    fig.update_layout(
 
-    legend = [r"$\tilde{F}_{%s}$" % i for i in range(n)] + ["$F$"]
+        title="The first N Components of the analysed Time Series",
+        xaxis_title="t",
+        yaxis_title="Components",
 
-    fig.set_title("The First 12 Components of the Toy Time Series")
-    fig.legend(legend, loc=(1.05, 0.1))
+        autosize=False,
+        width=1000,
+        height=800,
+        margin=dict(
 
-    plt.show()
+            l=50,
+            r=50,
+            b=100,
+            t=100,
+            pad=4
+        )
+    )
+
+    fig.show()
 
 
 def generalPlot(t, F, trend, periodic1, periodic2, noise):
@@ -169,17 +263,29 @@ def generalPlot(t, F, trend, periodic1, periodic2, noise):
 
     """
 
-    plt.plot(t, F, lw=2.5)
-    plt.plot(t, trend, alpha=0.75)
-    plt.plot(t, periodic1, alpha=0.75)
-    plt.plot(t, periodic2, alpha=0.75)
-    plt.plot(t, noise, alpha=0.5)
-    plt.legend(["Toy Series ($F$)", "Trend", "Periodic #1", "Periodic #2", "Noise"])
-    plt.xlabel("$t$")
-    plt.ylabel("$F(t)$")
-    plt.title("The Toy Time Series and its Components")
+    fig = go.Figure()
 
-    plt.show()
+    fig.add_trace(go.Scatter(x=t, y=F, name="Generated Series ($F$)", mode='lines', line=dict(width=5),
+                             connectgaps=True, ))
+    fig.add_trace(go.Scatter(x=t, y=trend, name="Trend", mode="lines",
+                  line=dict(width=2.5), connectgaps=True, ))
+    fig.add_trace(go.Scatter(x=t, y=periodic1,  name="Periodic #1",
+                  mode="lines", line=dict(width=2.5), connectgaps=True, ))
+    fig.add_trace(go.Scatter(x=t, y=periodic2, name="Periodic #2",
+                  mode="lines", line=dict(width=2.5), connectgaps=True, ))
+    fig.add_trace(go.Scatter(x=t, y=noise, name="Noise", mode="lines",
+                  line=dict(width=2.5), connectgaps=True, ))
+
+    fig.update_layout(
+
+        title="Generated time series and its components",
+        xaxis_title="t",
+        yaxis_title="F(t)",
+    )
+
+    fig.show()
+
+    return fig
 
 
 def hankeliseMatrices(n, X_elem):
@@ -198,15 +304,41 @@ def hankeliseMatrices(n, X_elem):
     None.
 
     """
+
+    mtitles = []
     for j in range(0, n):
-        plt.subplot(4, 4, j+1)
-        title = r"$\tilde{\mathbf{X}}_{" + str(j) + "}$"
+        mtitles.append(r"$\tilde{\mathbf{X}}_{" + str(j) + "}$")
 
-        plot_2d(spssa.hankelise(X_elem[j]), title)
+    fig = make_subplots(rows=3, cols=4,
+                        vertical_spacing=0.05,
+                        horizontal_spacing=0.075,
+                        subplot_titles=mtitles)
 
-    plt.tight_layout()
+    j = 0
+    for iRow in range(3):
 
-    plt.show()
+        for iCol in range(4):
+
+            fig.add_trace(go.Heatmap(z=spssa.hankelise(X_elem[j]), showscale=False),
+                          row=iRow+1,
+                          col=iCol+1,
+                          )
+
+            # fig.update_layout(xaxis_title=r"$\tilde{\mathbf{X}}_{" + str(j) + "}$")
+
+            fig.update_annotations(yshift=25)
+
+            j = j+1
+
+    # fig.update_coloraxes(showscale=False)
+
+    # fig.update_layout(
+    #    colorscale='Viridis',
+    #    xaxis_title=" ",
+    #    yaxis_title=" ",
+    # )
+
+    fig.show()
 
 
 def elementaryMatrices(n, X_elem):
@@ -245,23 +377,25 @@ def contributionPlot(Sigma, sigma_sumsq):
 
     """
 
-    fig, ax = plt.subplots(1, 2, figsize=(14, 5))
-    ax[0].plot(Sigma**2 / sigma_sumsq * 100, lw=2.5)
-    ax[0].set_xlim(0, 11)
-    ax[0].set_title("Relative Contribution of $\mathbf{X}_i$ to Trajectory Matrix")
-    ax[0].set_xlabel("$i$")
-    ax[0].set_ylabel("Contribution (%)")
+    fig = make_subplots(rows=1, cols=2)
 
-    ax[1].plot((Sigma**2).cumsum() / sigma_sumsq * 100, lw=2.5)
-    ax[1].set_xlim(0, 11)
-    ax[1].set_title("Cumulative Contribution of $\mathbf{X}_i$ to Trajectory Matrix")
-    ax[1].set_xlabel("$i$")
-    ax[1].set_ylabel("Contribution (%)")
+    xvec = np.arange(len(Sigma))
 
-    plt.show()
+    fig.add_trace(go.Scatter(x=xvec, y=Sigma**2 / sigma_sumsq * 100, mode="lines",
+                             name="Relative Contribution"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=xvec, y=(Sigma**2).cumsum() / sigma_sumsq * 100, mode="lines",
+                             name="Cumulative Contribution"), row=1, col=2)
+
+    fig.update_layout(height=800, width=1500,
+                      title_text="Contributions to Trajectory Matrix",
+                      xaxis_title="$i$",
+                      yaxis_title="Contribution (%)"
+                      )
+
+    fig.show()
 
 
-def plot_2d(m, title=""):
+def plot_2d(m, mtitle=""):
     """
     Funkcia zobrazi 2D plot
 
@@ -278,12 +412,23 @@ def plot_2d(m, title=""):
 
     """
 
-    plt.imshow(m)
-    plt.xticks([])
-    plt.yticks([])
-    plt.title(title)
+    fig = go.Figure(go.Heatmap(z=m))
+    fig.update_layout(
+
+        title=mtitle,
+        xaxis_title=" ",
+        yaxis_title=" ",
+        # coloraxis_colorbar=dict(
+        #     title="$F(t)$",
+        # ),
+    )
+    # plt.imshow(m)
+    # plt.xticks([])
+    # plt.yticks([])
+    # plt.title(title)
 
     # plt.show()
+    return fig
 
 
 def trajectoryMatrix(X):
@@ -301,14 +446,26 @@ def trajectoryMatrix(X):
 
     """
 
-    ax = plt.matshow(X)
-    plt.xlabel("$L$-Lagged Vectors")
-    plt.ylabel("$K$-Lagged Vectors")
-    plt.colorbar(ax.colorbar, fraction=0.025)
-    ax.colorbar.set_label("$F(t)$")
-    plt.title("The Trajectory Matrix for the Toy Time Series")
+    fig = go.Figure(go.Heatmap(z=X))
 
-    plt.show()
+    fig.update_layout(
+
+        title="The trajectory matrix for the analysed time series",
+        xaxis_title="$L$-Lagged Vectors",
+        yaxis_title="$K$-Lagged Vectors",
+        # coloraxis_colorbar=dict(
+        #     title="$F(t)$",
+        # ),
+    )
+
+    # ax = plt.matshow(X)
+    # plt.xlabel("$L$-Lagged Vectors")
+    # plt.ylabel("$K$-Lagged Vectors")
+    # plt.colorbar(ax.colorbar, fraction=0.025)
+    # ax.colorbar.set_label("$F(t)$")
+    # plt.title("The Trajectory Matrix for the Toy Time Series")
+
+    fig.show()
 
 
 def lineBarPlot(tVec, xVec, yVec, mTitle=" ", xLabel=" ", yLabel=" ", y2Label=" "):
@@ -451,6 +608,27 @@ def prediction(mtim, mdat, ptim, real, pred, ci):
 
     """
 
+    fig = go.Figure()
+
+    # model figure
+    fig.add_trace(go.Scatter(x=mtim, y=mdat, mode="lines", name="Model Estimations"))
+    # prediction
+    fig.add_trace(go.Scatter(x=ptim, y=real, mode="lines", name="Real Measurements"))
+    fig.add_trace(go.Scatter(x=ptim, y=pred, mode="lines", name="Prediction"))
+    # confidence interval
+    fig.add_trace(go.Scatter(x=ptim, y=pred+ci, fill=None, mode="lines",
+                  name="95% Confidence Interval Upper Bound"))
+    fig.add_trace(go.Scatter(x=ptim, y=pred-ci, fill="tonexty",
+                  mode="lines", name="95% Confidence Interval Lower Bound"))
+
+    fig.update_layout(width=1800, height=800,
+                      title_text="Prediction model",
+                      xaxis_title="t (day)",
+                      yaxis_title="UfG (kWh)")
+
+    fig.show()
+
+    """
     fig, ax = plt.subplots(figsize=(15, 7))
     # zobrazenie modelu
     ax.plot(mtim, mdat, color="#b35151", label="Model Estimations")
@@ -467,7 +645,7 @@ def prediction(mtim, mdat, ptim, real, pred, ci):
     ax.legend()
 
     plt.show()
-
+    """
     return 0
 
 
@@ -781,10 +959,9 @@ def multilineChart(df, xLabel=" ", yLabel=" ", title=" "):
     _, b = df.shape
 
     for s in df.columns:
-        fig.add_trace(go.Scatter(x=df["DATE"],
-                                 y=df[s],
-                                 name=s,
-                                 fill=None))
+        if s != "DATE":
+            fig.add_trace(go.Scatter(x=df["DATE"], y=df[s], name=s, mode="lines", fill=None))
+
     # for i in range(1, b):
     #    fig.add_trace(go.Scatter(x=df["DATE"], y=df[df.columns[i]], name=df.columns[i]))
 
