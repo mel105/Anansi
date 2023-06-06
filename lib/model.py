@@ -135,7 +135,7 @@ class model:
                     ls = float(coef[j+1])*float(inp[i, j])
                     # print(i, j, coef[j+1], inp[i, j], ls)
                     # tmp += float(coef[j+1])*float(inp[i, j])
-                    arr[j] = ls
+                    arr[j+1] = ls
                     tmp += ls
 
                 self._val.append(tmp)

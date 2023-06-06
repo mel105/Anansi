@@ -194,8 +194,8 @@ def summary(lVec, eVec, stations, A, dh, Qvv, N, coef, probup, conf):
 
     # Priprava tabulky na tlac
     table = []
-    header = []
-
+    mheader = []
+    mfmt = []
     if verb == 0:
 
         print("Warning: For printing and saving the results, please configure verbosity in setLSQ setting. \
@@ -208,9 +208,10 @@ def summary(lVec, eVec, stations, A, dh, Qvv, N, coef, probup, conf):
             row = [stations[i], initCoef[i], std[i], mC[i]]
             table.append(row)
 
-        header = ["Station", "Coef", "Standardized Coef", "Standard Deviation"]
+        mheader = ["Station", "Coef", "StandardizedCoef", "StandardDeviation"]
+        mfmt = ["%s", "%f", "%f", "%f"]
 
-        print(tabulate(table, headers=header, tablefmt="outline"))
+        print(tabulate(table, headers=mheader, tablefmt="outline"))
     else:
 
         print("\nOdhad koeficientov:\n")
@@ -220,24 +221,21 @@ def summary(lVec, eVec, stations, A, dh, Qvv, N, coef, probup, conf):
             row = [stations[i], initCoef[i], std[i], mC[i], tstat[i], pval[i], islow[i], isup[i]]
             table.append(row)
 
-        header = ["Station", "Coef", "Standardized Coef", "Standard Deviation", "t-stat", "p-val",
-                  "Lower Bound", "Upper Bound"]
+        mheader = ["Station", "Coef", "StandardizedCoef", "StandardDeviation", "t-stat", "p-val",
+                   "LowerBound", "UpperBound"]
+        mfmt = ["%s", "%f", "%f", "%f", "%f", "%f", "%f", "%f"]
 
-        print(tabulate(table, headers=header, tablefmt="outline"))
+        print(tabulate(table, headers=mheader, tablefmt="outline"))
 
-    with open(outPath + "/" + "results.csv", 'w', encoding='UTF8') as f:
-        writer = csv.writer(f)
+    # save the results
 
-        # write the header
-        writer.writerow(header)
-
-        # write the data
-        writer.writerow(table)
-
-    np.savetxt(outPath + "/" + "results2.csv",
+    np.savetxt(outPath + "/" + "lsq.csv",
                table,
                delimiter=", ",
-               fmt='% s')
+               header=", ".join(mheader),
+               newline="\n",
+               comments="",
+               fmt=mfmt)
 
 
 def standardCoef(coef, lVec, A):

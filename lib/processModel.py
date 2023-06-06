@@ -7,6 +7,7 @@ Created on Fri Feb 10 16:53:09 2023
 """
 
 import pandas as pd
+import numpy as np
 
 import lib.lsq as lsq
 import lib.support as msupp
@@ -254,6 +255,17 @@ class processModel:
 
         losses.columns = header
         self._loss = losses
+
+        # Save the losses
+        outPath = self._conf.getOutLocalPath()+"/"+self._conf.getCsvFolderName()
+        np.savetxt(outPath + "/" + "losses.csv",
+                   self._loss,
+                   delimiter=", ",
+                   header=",".join(header),
+                   newline="\n",
+                   comments="",
+                   fmt="%f")
+
         print(self._loss)
 
         # Statistiky po vyrovnani modelu

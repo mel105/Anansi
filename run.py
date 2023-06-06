@@ -288,11 +288,11 @@ def run():
     # Metriky vyhladenych dat
     # mt.metrics(np.array(realSmtObj.getSmtSeries()), np.array(calcSmtObj.getSmtSeries()))
     """
-    return decObj  # , confObj, modelObj
+    return decObj, confObj  # , modelObj
 
 
 # Spustenie spracovania dat
 if __name__ == "__main__":
 
-    data = run()
+    data,  conf = run()
     # testSSA()
