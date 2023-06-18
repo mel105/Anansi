@@ -20,6 +20,7 @@ import pandas as pd
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 import lib.config as cfg
 import lib.processModel as prc
@@ -35,6 +36,107 @@ import lib.visualGroups as grp
 import lib.support as sp
 import lib.supportSSA as spssa
 import lib.SSA as ssa
+
+from sklearn import linear_model
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score
+
+import statsmodels.api as sm
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+from statsmodels.tools.tools import add_constant
+
+
+def testMLR():
+    """
+    Funkcia otestuje MLR pomocou python packagies
+
+    Returns
+    -------
+    None.
+
+    """
+
+    print("TEST MLR Algoritmu")
+
+    # Nacitanie koniguracneho suboru
+    confObj = cfg.config()
+
+    # Nastavenie adresarov, kam sa budu ukladat obrazky/subory CSV (neskor treba textove protokoly)
+    sp.checkFolder(confObj.getOutLocalPath())
+    sp.checkFolder(confObj.getOutLocalPath()+"/"+confObj.getFigFolderName())
+    sp.checkFolder(confObj.getOutLocalPath()+"/"+confObj.getCsvFolderName())
+
+    # Nacitanie dat
+    fileName = confObj.getInpFileName()
+    filePath = confObj.getInpFilePath()
+    decObj = dc.decoder(fileName, filePath, confObj)
+
+    # Rozdelenie dat na zavisle a nezavisle veliciny. Tie su definovane v konfiguraku
+    listOfStations = confObj.getOutStations()
+    # vsetky tieto remove stanice vychadzaju z predpokladu overenia multikolinearity. Pred vyhodenim Barousova
+    # presnost modelu je 62,69%  a condition number 4,14e+9
+
+    df = decObj.getDF()
+    dt = sp.fillDataContainer(df, listOfStations)
+    X = pd.DataFrame(data=dt, columns=listOfStations)
+    y = df["TOTAL NB"]
+
+    # set figure size
+    # plt.figure(figsize=(10, 7))
+
+    # Generate a mask to onlyshow the bottom triangle
+    # mask = np.triu(np.ones_like(X.corr(), dtype=bool))
+
+    # generate heatmap
+    # sns.heatmap(X.corr(), annot=True, mask=mask, vmin=-1, vmax=1)
+    # plt.title('Correlation Coefficient Of Predictors')
+    # plt.show()
+
+    # Clustermap
+    # plt.figure(figsize=(40, 40))
+    # sns.clustermap(X.corr())
+    # plt.show()
+    plt.figure(figsize=(40, 40))
+    sns.pairplot(X, kind="scatter", diag_kind="kde", height=1)
+    plt.savefig("pairplot.png")
+    # plt.show()
+    # Overenie multikolinearity
+    cv = compute_vif(X, listOfStations).sort_values('VIF', ascending=False)
+    print(cv)
+
+    # MLR pomocou sklear
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+    regObj = linear_model.LinearRegression()
+    regObj.fit(X_train, y_train)
+    y_pred = regObj.predict(X_test)
+    accuracy = r2_score(y_test, y_pred)*100
+    print(" Accuracy of the model is %.2f" % accuracy)
+
+    # MLR pomocou statsmodels
+    X = sm.add_constant(X)  # adding a constant
+
+    model = sm.OLS(y, X).fit()
+    predictions = model.predict(X)
+
+    print_model = model.summary()
+    print(print_model)
+
+    return decObj, X, regObj, predictions, cv
+
+
+def compute_vif(df, considered_features):
+
+    X = df[considered_features]
+    # the calculation of variance inflation requires a constant
+    X['intercept'] = 1
+
+    # create dataframe to store vif values
+    vif = pd.DataFrame()
+    vif["Variable"] = X.columns
+    vif["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
+    vif = vif[vif['Variable'] != 'intercept']
+
+    return vif
 
 
 def testSSA():
@@ -294,5 +396,6 @@ def run():
 # Spustenie spracovania dat
 if __name__ == "__main__":
 
-    data,  conf = run()
+    # data,  conf = run()
     # testSSA()
+    decObj, data, regObj, pred, cv = testMLR()
