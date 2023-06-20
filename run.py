@@ -16,34 +16,165 @@ Postupne by tento skript ma zastresit tieto ukony:
 @author: mel
 """
 
+# from sklearn.model_selection import train_test_split, cross_val_score
+# from sklearn.metrics import mean_squared_error, mean_absolute_error
+# from sklearn import metrics
+# from sklearn.linear_model import LinearRegression
+from statsmodels.tools.tools import add_constant
+import statsmodels.api as sm
+import warnings
+import lib.SSA as ssa
+import lib.supportSSA as spssa
+import lib.support as sp
+import lib.charts as cha
+import lib.validation as vl
+import lib.decoder as dc
+import lib.processModel as prc
+import lib.config as cfg
+import seaborn as sns
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+from sklearn import metrics
+from sklearn.linear_model import LinearRegression
+from sklearn import linear_model
+from sklearn.metrics import r2_score
+from sklearn.cluster import DBSCAN
+from sklearn.datasets import make_classification
+from sklearn.cluster import KMeans
+
+from numpy import unique
+from numpy import where
+from sklearn.datasets import make_classification
+from sklearn.cluster import Birch
+
+
 import pandas as pd
 import numpy as np
 import math
 import matplotlib.pyplot as plt
-import seaborn as sns
+import mpld3
+from matplotlib.backends.backend_webagg import (
+    FigureManagerWebAgg, new_figure_manager_given_figure)
+from matplotlib.figure import Figure
 
-import lib.config as cfg
-import lib.processModel as prc
-import lib.smoothSeries as smt
-import lib.metrics as mt
-import lib.processUfg as ufg
-import lib.decoder as dc
-import lib.validation as vl
-import lib.descriptive as ds
-import lib.charts as cha
-import lib.visualRelations as rel
-import lib.visualGroups as grp
-import lib.support as sp
-import lib.supportSSA as spssa
-import lib.SSA as ssa
 
-from sklearn import linear_model
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score
+# import lib.smoothSeries as smt
+# import lib.metrics as mt
+# import lib.processUfg as ufg
+# import lib.descriptive as ds
+# import lib.visualRelations as rel
+# import lib.visualGroups as grp
 
-import statsmodels.api as sm
-from statsmodels.stats.outliers_influence import variance_inflation_factor
-from statsmodels.tools.tools import add_constant
+warnings.filterwarnings("ignore")
+
+
+# We will use some methods from the sklearn module
+
+# from sklearn import linear_model
+# from sklearn.model_selection import train_test_split
+# from sklearn.metrics import r2_score
+
+def testClustering():
+    """
+    Funkcia otestuje moznosti clustrovania. Cluster algoritmus by som chcel pouzit na data Ratio vs. UfG, kde 
+    by sa mohli ukazat za akych podmienok sme schopni vysledovast pozit9vne UfG
+
+    Returns
+    -------
+    None.
+
+    """
+
+    print("TEST Cluster Algoritmu")
+
+    # Nacitanie koniguracneho suboru
+    confObj = cfg.config()
+
+    # Nastavenie adresarov, kam sa budu ukladat obrazky/subory CSV (neskor treba textove protokoly)
+    sp.checkFolder(confObj.getOutLocalPath())
+    sp.checkFolder(confObj.getOutLocalPath()+"/"+confObj.getFigFolderName())
+    sp.checkFolder(confObj.getOutLocalPath()+"/"+confObj.getCsvFolderName())
+
+    # Nacitanie dat
+    fileName = confObj.getInpFileName()
+    filePath = confObj.getInpFilePath()
+    decObj = dc.decoder(fileName, filePath, confObj)
+
+    # Rozdelenie dat na zavisle a nezavisle veliciny. Tie su definovane v konfiguraku
+    listOfStations = confObj.getOutStations()
+
+    df = decObj.getDF()
+    dt = sp.fillDataContainer(df, listOfStations)
+    X = pd.DataFrame(data=dt, columns=listOfStations)
+    y = df["TOTAL NB"]
+
+    XC = pd.DataFrame({"y": y, "X": df["Paskov"]})
+    # centrovanie dat
+    # XC = X.apply(lambda x: x-x.mean())
+    # yC = df["TOTAL NB"].apply(lambda x: x-x.mean())
+
+    # Normalize the values
+    XC = StandardScaler().fit_transform(XC)
+
+    fig1 = plt.figure(figsize=(10, 6))
+    plt.scatter(XC[:, 0], XC[:, 1], c=y, cmap='Paired')
+    plt.title("Data")
+    mpld3.show()
+
+    # DBSCAN
+    db = DBSCAN(eps=0.4, min_samples=4)
+    db.fit(XC)
+
+    y_pred = db.fit_predict(XC)
+    fig4 = plt.figure(figsize=(10, 6))
+    plt.scatter(XC[:, 0], XC[:, 1], c=y_pred, cmap='Paired')
+    plt.title("Clusters determined by DBSCAN")
+    mpld3.show()
+
+    # BIRCH
+    # define the model
+    model = Birch(threshold=0.001, n_clusters=3)
+    # fit the model
+    model.fit(XC)
+    # assign a cluster to each example
+    yhat = model.predict(XC)
+    # retrieve unique clusters
+    clusters = unique(yhat)
+    # create scatter plot for samples from each cluster
+    fig2 = plt.figure()
+    for cluster in clusters:
+        # get row indexes for samples with this cluster
+        row_ix = where(yhat == cluster)
+        # create scatter of these samples
+        plt.scatter(XC[row_ix, 0], XC[row_ix, 1])
+        # show the plot
+
+    plt.title("BIRCH algorithm")
+    mpld3.show()
+
+    # K-MEANS
+    # define the model
+    model = KMeans(n_clusters=6)
+    # fit the model
+    model.fit(XC)
+    # assign a cluster to each example
+    yhat = model.predict(XC)
+    # retrieve unique clusters
+    clusters = unique(yhat)
+    # create scatter plot for samples from each cluster
+    fig3 = plt.figure()
+    for cluster in clusters:
+        # get row indexes for samples with this cluster
+        row_ix = where(yhat == cluster)
+        # create scatter of these samples
+        plt.scatter(XC[row_ix, 0], XC[row_ix, 1])
+
+    # show the plot
+    plt.title("K-MEANS")
+    mpld3.show()
 
 
 def testMLR():
@@ -73,13 +204,55 @@ def testMLR():
 
     # Rozdelenie dat na zavisle a nezavisle veliciny. Tie su definovane v konfiguraku
     listOfStations = confObj.getOutStations()
-    # vsetky tieto remove stanice vychadzaju z predpokladu overenia multikolinearity. Pred vyhodenim Barousova
-    # presnost modelu je 62,69%  a condition number 4,14e+9
 
     df = decObj.getDF()
     dt = sp.fillDataContainer(df, listOfStations)
     X = pd.DataFrame(data=dt, columns=listOfStations)
     y = df["TOTAL NB"]
+
+    # centrovanie dat
+    XC = X.apply(lambda x: x-x.mean())
+
+    # kontrola odlahlych merani i ked :D
+    # fig, axs = plt.subplots(2, figsize=(5, 5))
+    # plt1 = sns.boxplot(df['DUN'], ax=axs[0])
+    # plt2 = sns.boxplot(df['HVE'], ax=axs[1])
+    # plt.tight_layout()
+    # plt.show()
+
+    # Rozdelenie UfG
+    # fig = plt.figure()
+    # sns.distplot(df["TOTAL NB"])
+    # plt.show()
+
+    # fig = plt.figure()
+    # sns.pairplot(df, x_vars=["DUN", "HSK", "Paskov", "Bartoušov"],
+    #             y_vars="TOTAL NB", height=4, aspect=1, kind="scatter")
+    # plt.show()
+
+    # Model building
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=100)
+
+    reg_model = linear_model.LinearRegression()
+    # Fitting the Multiple Linear Regression model
+    reg_model = LinearRegression().fit(X_train, y_train)
+    # Printing the model coefficients
+    print('Intercept: ', reg_model.intercept_)
+    # pair the feature names with the coefficients
+    list(zip(X, reg_model.coef_))
+    # Predicting the Test and Train set result
+    y_pred = reg_model.predict(X_test)
+    x_pred = reg_model.predict(X_train)
+    # Actual value and the predicted value
+    reg_model_diff = pd.DataFrame({'Actual value': y_test, 'Predicted value': y_pred})
+    reg_model_diff
+    mae = metrics.mean_absolute_error(y_test, y_pred)
+    mse = metrics.mean_squared_error(y_test, y_pred)
+    r2 = np.sqrt(metrics.mean_squared_error(y_test, y_pred))
+
+    print('Mean Absolute Error:', mae)
+    print('Mean Square Error:', mse)
+    print('Root Mean Square Error:', r2)
 
     # set figure size
     # plt.figure(figsize=(10, 7))
@@ -96,23 +269,27 @@ def testMLR():
     # plt.figure(figsize=(40, 40))
     # sns.clustermap(X.corr())
     # plt.show()
-    plt.figure(figsize=(40, 40))
-    sns.pairplot(X, kind="scatter", diag_kind="kde", height=1)
-    plt.savefig("pairplot.png")
+    # plt.figure(figsize=(40, 40))
+    # sns.pairplot(X, kind="scatter", diag_kind="kde", height=1)
+    # plt.savefig("pairplot.png")
     # plt.show()
     # Overenie multikolinearity
-    cv = compute_vif(X, listOfStations).sort_values('VIF', ascending=False)
-    print(cv)
+
+    # cv = compute_vif(X, listOfStations).sort_values('VIF', ascending=False)
+    # print(cv)
 
     # MLR pomocou sklear
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
-    regObj = linear_model.LinearRegression()
-    regObj.fit(X_train, y_train)
-    y_pred = regObj.predict(X_test)
-    accuracy = r2_score(y_test, y_pred)*100
-    print(" Accuracy of the model is %.2f" % accuracy)
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+    # regObj = linear_model.LinearRegression()
+    # regObj.fit(X_train, y_train)
+    # y_pred = regObj.predict(X_test)
+    # accuracy = r2_score(y_test, y_pred)*100
+    # print(" Accuracy of the model is %.2f" % accuracy)
 
+    """
     # MLR pomocou statsmodels
+    print("\n\nNECENTROVANE\n\n")
+
     X = sm.add_constant(X)  # adding a constant
 
     model = sm.OLS(y, X).fit()
@@ -121,7 +298,19 @@ def testMLR():
     print_model = model.summary()
     print(print_model)
 
-    return decObj, X, regObj, predictions, cv
+    print("\n\nCENTROVANE\n\n")
+
+    X = sm.add_constant(XC)  # adding a constant
+
+    model = sm.OLS(y, X).fit()
+    predictions = model.predict(X)
+
+    print_model = model.summary()
+    print(print_model)
+
+    # predictions = 0
+    """
+    return X, XC
 
 
 def compute_vif(df, considered_features):
@@ -398,4 +587,5 @@ if __name__ == "__main__":
 
     # data,  conf = run()
     # testSSA()
-    decObj, data, regObj, pred, cv = testMLR()
+    # data, datac = testMLR()
+    testClustering()
