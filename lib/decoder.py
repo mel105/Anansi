@@ -55,6 +55,9 @@ class decoder:
             print("\nWARNING: TOTAL NB was reconstructed by SSA algorithm. Please be carefull for \
                   futher TOTAL NB parameter analysing\n")
 
+        # centrovanie dat, t.j. od kazdeho stlpca odcitam jeho priemernu hodnotu. Malo by to pomoct potlacit
+        # kolinearitu medzi datmi.
+
         self._dfred = self._df
 
         # kopia df matice. To pre neskorsiu validaciu
