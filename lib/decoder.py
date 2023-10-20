@@ -47,6 +47,41 @@ class decoder:
         for i in range(len(ri)):
             self._df.loc[ri[i], self._df.columns[ci[i]]] = 0.0
 
+        # kopia df matice. To pre neskorsiu validaciu pripradne zalohu povodnych dat, pretoze v df neskor
+        # data centrujem o priemer.
+        self._dfFull = self._df
+
+        # centrovanie dat, t.j. od kazdeho stlpca odcitam jeho priemernu hodnotu. Malo by to pomoct potlacit
+        # kolinearitu medzi datmi. Najprv odstranim stlpec DATE a mozno aj TOTAL NB, data zcentrujem a potom
+        # odstranene stlpce opat pridam do dataframeu
+        tm = self._df["DATE"]
+        self._df = self._df.apply(lambda x: x-x.mean())
+        self._df["DATE"] = tm
+
+        # vysetrenie linearnej zavislosti vektorov vo vstupnych datach.
+        matrix = self._df
+        matrix = matrix.drop(columns="DATE")
+        matrix = matrix.to_numpy()
+        ld = []
+
+        for i in range(matrix.shape[1]):
+
+            for j in range(matrix.shape[1]):
+
+                if i != j:
+                    inner_product = np.inner(
+                        matrix[:, i],
+                        matrix[:, j]
+                    )
+                    norm_i = np.linalg.norm(matrix[:, i])
+                    norm_j = np.linalg.norm(matrix[:, j])
+
+                    if np.abs(inner_product - norm_j * norm_i) < 1E-1:
+                        # print(i, j, 'Dependent')
+                        ld.append(i)
+
+        # print(ld)
+
         # Vyhladenie TOTAL NB pomocou SSA algoritmu
         if confObj.getSmoothingMethod() == "SSA":
             F_ssa = ssa.SSA(self._df["TOTAL NB"], 360)
@@ -55,13 +90,7 @@ class decoder:
             print("\nWARNING: TOTAL NB was reconstructed by SSA algorithm. Please be carefull for \
                   futher TOTAL NB parameter analysing\n")
 
-        # centrovanie dat, t.j. od kazdeho stlpca odcitam jeho priemernu hodnotu. Malo by to pomoct potlacit
-        # kolinearitu medzi datmi.
-
         self._dfred = self._df
-
-        # kopia df matice. To pre neskorsiu validaciu
-        self._dfFull = self._df
 
         # definovanie si stlpcov, ktore nie su numerickeho typu
         for i in self._dfred.columns:
@@ -80,6 +109,7 @@ class decoder:
         # Na obrazovku vytlac info o dataframe
         self._dfFull.info()
 
+        """
         # Rozsirenie full dataframe o styri stlpce: Year-Month, Year, Month, Week
         self._dfExt = self._df  # kopia full matice, ktoru rozsirim o nove polozky
         self._dfExt["YM"] = [i.strftime("%Y-%m") for i in list(self._df.DATE)]
@@ -102,6 +132,7 @@ class decoder:
         # Tyzdenne priemery
         self._dfWeekly = self._dfExt.groupby(["YW", "WEEK"]).mean()
         self._dfWeekly = self._dfWeekly.reset_index()
+        """
 
     def getDFYearly(self):
         """
@@ -112,21 +143,21 @@ class decoder:
         None.
 
         """
-        return self._dfYearly
+        return 0  # self._dfYearly
 
     def getDFMonthly(self):
         """
         Funkcia vrati dataframe s napocitanymi mesacnymi priemermi
         """
 
-        return self._dfMonthly
+        return 0  # self._dfMonthly
 
     def getDFWeekly(self):
         """
         Funkcia vrati dataframe s napocitanymi tyzdennymi priemermi
         """
 
-        return self._dfWeekly
+        return 0  # self._dfWeekly
 
     def getDFExt(self):
         """
