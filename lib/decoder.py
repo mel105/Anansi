@@ -8,7 +8,6 @@ Created on Fri Feb 10 17:02:49 2023
 
 import pandas as pd
 import numpy as np
-import lib.SSA as ssa
 
 
 class decoder:
@@ -32,6 +31,7 @@ class decoder:
 
             """
 
+        # nacitanie originalnych dat, ktore si pripravime v excel programe
         self._df = pd.read_excel(filePath+"/"+fileName[0]+".xlsx", verbose=True)
         self._df.rename(columns={self._df.columns[0]: "DATE"}, inplace=True)
 
@@ -49,48 +49,53 @@ class decoder:
 
         # kopia df matice. To pre neskorsiu validaciu pripradne zalohu povodnych dat, pretoze v df neskor
         # data centrujem o priemer.
-        self._dfFull = self._df
+        self._dfFull = self._df.copy()
 
-        # centrovanie dat, t.j. od kazdeho stlpca odcitam jeho priemernu hodnotu. Malo by to pomoct potlacit
-        # kolinearitu medzi datmi. Najprv odstranim stlpec DATE a mozno aj TOTAL NB, data zcentrujem a potom
-        # odstranene stlpce opat pridam do dataframeu
-        tm = self._df["DATE"]
-        self._df = self._df.apply(lambda x: x-x.mean())
-        self._df["DATE"] = tm
+        # Na obrazovku vytlac info o dataframe. dfFull teda obsahuje uplne orig data
+        self._dfFull.info()
 
-        # vysetrenie linearnej zavislosti vektorov vo vstupnych datach.
-        matrix = self._df
-        matrix = matrix.drop(columns="DATE")
-        matrix = matrix.to_numpy()
-        ld = []
+        # Centrovanie dat
+        # t.j. od kazdeho stlpca odcitam jeho priemernu hodnotu. Malo by to pomoct potlacit kolinearitu medzi
+        # datmi. Najprv odstranim stlpec DATE a mozno aj TOTAL NB, data zcentrujem a potom odstranene stlpce
+        # opat pridam do dataframeu
+        if confObj.getCentering():
 
-        for i in range(matrix.shape[1]):
+            tm = self._df["DATE"]
+            self._df = self._df.apply(lambda x: x-x.mean())
+            self._df["DATE"] = tm
 
-            for j in range(matrix.shape[1]):
+        # Linearna zavislost
+        # Vysetrenie linearnej zavislosti vektorov vo vstupnych datach a to z dovodu identifikacie, ktore
+        # stlpce dat su ako zavisle
+        if confObj.getInvestLin():
 
-                if i != j:
-                    inner_product = np.inner(
-                        matrix[:, i],
-                        matrix[:, j]
-                    )
-                    norm_i = np.linalg.norm(matrix[:, i])
-                    norm_j = np.linalg.norm(matrix[:, j])
+            matrix = self._df
+            matrix = matrix.drop(columns="DATE")
+            matrix = matrix.to_numpy()
+            ld = []
 
-                    if np.abs(inner_product - norm_j * norm_i) < 1E-1:
-                        # print(i, j, 'Dependent')
-                        ld.append(i)
+            for i in range(matrix.shape[1]):
 
-        # print(ld)
+                for j in range(matrix.shape[1]):
 
-        # Vyhladenie TOTAL NB pomocou SSA algoritmu
-        if confObj.getSmoothingMethod() == "SSA":
-            F_ssa = ssa.SSA(self._df["TOTAL NB"], 360)
-            self._df["TOTAL NB ORIG"] = self._df["TOTAL NB"]
-            self._df["TOTAL NB"] = F_ssa.reconstruct(slice(0, 50))
-            print("\nWARNING: TOTAL NB was reconstructed by SSA algorithm. Please be carefull for \
-                  futher TOTAL NB parameter analysing\n")
+                    if i != j:
+                        inner_product = np.inner(
+                            matrix[:, i],
+                            matrix[:, j]
+                        )
+                        norm_i = np.linalg.norm(matrix[:, i])
+                        norm_j = np.linalg.norm(matrix[:, j])
 
-        self._dfred = self._df
+                        if np.abs(inner_product - norm_j * norm_i) < 1E-1:
+                            # print(i, j, 'Dependent')
+                            ld.append(i)
+
+            # print(ld)
+
+        # Orezanie df casovej rady podla beg, end definovane v config
+        # dfred je copy originalne df s typ, ze ale tam bude neskor orezana podla toho, ako mam v configu
+        # nastaveny beg, end.
+        self._dfred = self._df.copy()
 
         # definovanie si stlpcov, ktore nie su numerickeho typu
         for i in self._dfred.columns:
@@ -99,26 +104,20 @@ class decoder:
             if j is False:
                 self._dfred = self._dfred.drop(columns=i, axis=1)
 
-        # Filtrovanie dat podla zadanych limitnych datumov
-        self._df = self._df[(self._df['DATE'] >= confObj.getBeg()) &
-                            (self._df['DATE'] <= confObj.getEnd())]
-
         self._dfred = self._dfred[(self._dfred['DATE'] >= confObj.getBeg()) &
                                   (self._dfred['DATE'] <= confObj.getEnd())]
 
-        # Na obrazovku vytlac info o dataframe
-        self._dfFull.info()
-
-        """
-        # Rozsirenie full dataframe o styri stlpce: Year-Month, Year, Month, Week
-        self._dfExt = self._df  # kopia full matice, ktoru rozsirim o nove polozky
+        # VYROBENIE PRIEMEROV
+        # Rozsirenie full dataframe o styri stlpce: Year-Month, Year, Month, Week. Pre tento ucel pouzival
+        # dalsiu copy df.
+        self._dfExt = self._df.copy()  # kopia full matice, ktoru rozsirim o nove polozky
         self._dfExt["YM"] = [i.strftime("%Y-%m") for i in list(self._df.DATE)]
         self._dfExt["YW"] = [i.strftime("%Y-%V") for i in list(self._df.DATE)]
         self._dfExt["YEAR"] = [i.strftime("%Y") for i in list(self._df.DATE)]
         self._dfExt["MONTH"] = [i.strftime("%m") for i in list(self._df.DATE)]
         self._dfExt["WEEK"] = [i.strftime("%V") for i in list(self._df.DATE)]
 
-        # Grupovanie dat. Zmyslom je pripravit data zgrupovane posla roku, potom podla mesiaca a podla tyzdna.
+        # Grupovanie dat. Zmyslom je pripravit data zgrupovane podla roku, potom podla mesiaca a podla tyzdna.
         # Vysledkom su nove dataframes, s mesacnymi, rocnymi a tyzdennymi priemermi
 
         # Rocne priemery
@@ -132,7 +131,6 @@ class decoder:
         # Tyzdenne priemery
         self._dfWeekly = self._dfExt.groupby(["YW", "WEEK"]).mean()
         self._dfWeekly = self._dfWeekly.reset_index()
-        """
 
     def getDFYearly(self):
         """
@@ -143,25 +141,26 @@ class decoder:
         None.
 
         """
-        return 0  # self._dfYearly
+        return self._dfYearly
 
     def getDFMonthly(self):
         """
         Funkcia vrati dataframe s napocitanymi mesacnymi priemermi
         """
 
-        return 0  # self._dfMonthly
+        return self._dfMonthly
 
     def getDFWeekly(self):
         """
         Funkcia vrati dataframe s napocitanymi tyzdennymi priemermi
         """
 
-        return 0  # self._dfWeekly
+        return self._dfWeekly
 
     def getDFExt(self):
         """
-        Funkcia vrati rozsirenu maticu o info YEAR, MONTH WEEK.
+        Funkcia vrati rozsirenu maticu o info YEAR, MONTH WEEK. Ak je v config subore pozadovane, aby sme data
+        redukovali o priemery, tak data su centrovane.
 
         Returns
         -------
@@ -187,7 +186,9 @@ class decoder:
         """
         Funkcia vrati naplneny kontajner formatu Dataframe. Je ale redukovany o stlpce, ktore boli
         identifikovane ako take, ktore obsahuju nenumericke hodnoty. Tuto maticu pouzijem napr. v pripade
-        heat matp diagramu alebo scatter mastrix diagramu.
+        heat matp diagramu alebo scatter mastrix diagramu. Navyse je matica casovo orezana o beg, end,
+        definovane v configure subore a ak je v config este pozadovane centrovanie na nulu, tak red. je tiez
+        centrovana.
 
         Returns
         -------
@@ -200,7 +201,8 @@ class decoder:
 
     def getDF(self):
         """
-        Funkcia vrati naplneny kontajner formatu Dataframe
+        Funkcia vrati naplneny kontajner formatu Dataframe. Matica je redukovana o priemery, teda centrovana
+        na nulu, ak to v configuraku pozadujem. Inak je to podobne ako dffull orig zdroj dat.
 
         Returns
         -------

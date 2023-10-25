@@ -208,6 +208,13 @@ class config:
         """
         return self._smoothingMethod
 
+    def getPlotSmoothingResults(self):
+        """
+        Ak je v config nastaveny True, resp. 1, potom vygenerujem obrazky validne pre SSA metodu
+        """
+
+        return self._plotSmoothingResults
+
     def getSmoothingBin(self):
         """
         Metoda vrati nejake vyhladzovacie kriterium. Napr. v pripade Moving average metody to zrejme
@@ -387,6 +394,27 @@ class config:
 
         return self._verLSQ
 
+    def getCentering(self):
+        """
+        Ak je v nastaveni True/1, to znamena, ze v decpder.py funkcii sa postaram o to, aby som od stlpcov
+        odcital ich priemer a data tak centroval na nulu
+
+        Returns
+        -------
+        None.
+
+        """
+
+        return self._centering
+
+    def getInvestLin(self):
+        """
+        Ak je config nastaveny na True, potom v decoder.py funkcii sa zaoberam studovanim linearnej zavoslosti
+        medzi jednotliv7mi stlpcami
+        """
+
+        return self._investLin
+
     ###################################################################################################
     # protected funkcie
 
@@ -415,6 +443,10 @@ class config:
         self._dbeg = cf["setInterval"]["dbeg"]
         self._dend = cf["setInterval"]["dend"]
 
+        # prevezme nastavenie tykajuce sa spracovania dat este v dekodery
+        self._centering = cf["setDecoder"]["centering"]
+        self._investLin = cf["setDecoder"]["investLin"]
+
         # prevezme nastavenie tykajuce sa Metody najmensich stvorcov
         self._maxIter = cf["setLSQ"]["maxIter"]
         self._epsVal = cf["setLSQ"]["epsVal"]
@@ -437,6 +469,7 @@ class config:
 
         # nacitanie nastavenia tykajuce sa vyhladenia casovych radov
         self._smoothingMethod = cf["setSmoothing"]["smoothingMethod"]
+        self._plotSmoothingResults = cf["setSmoothing"]["plotResults"]
         self._smoothingBin = cf["setSmoothing"]["smoothingBin"]
         self._smoothingAlt = cf["setSmoothing"]["smoothingAlt"]
 

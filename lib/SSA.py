@@ -84,6 +84,9 @@ class SSA(object):
         # Calculate the w-correlation matrix.
         self.calc_wcorr()
 
+        # plot the w-correlation matrix
+        # self.plot_wcorr("AAA")
+
     # PRIVATNE FUNKCIE
     def components_to_df(self, n=0):
         """

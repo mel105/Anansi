@@ -14,6 +14,11 @@
             "dbeg":"2022-07-01 00:00:00",
             "dend":"2023-04-05 00:00:00"
     },
+    "setDecoder":{
+                "centering": 1,
+                "investLin": 0
+    
+    },
     "setLSQ":{
             "maxIter":50,
             "epsVal":0.001, 
@@ -28,6 +33,7 @@
     },
     "setSmoothing":{
                 "smoothingMethod":"SSA",
+                "plotResults":1,
                 "smoothingBin":5,
                 "smoothingAlt": "center"
     },
