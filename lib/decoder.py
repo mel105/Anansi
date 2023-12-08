@@ -121,15 +121,15 @@ class decoder:
         # Vysledkom su nove dataframes, s mesacnymi, rocnymi a tyzdennymi priemermi
 
         # Rocne priemery
-        self._dfYearly = self._dfExt.groupby(["YEAR"]).mean()
+        self._dfYearly = self._dfExt.groupby(["YEAR"]).mean(numeric_only=True)
         self._dfYearly = self._dfYearly.reset_index()
 
         # Mesacne priemery
-        self._dfMonthly = self._dfExt.groupby(["YM", "MONTH"]).mean()
+        self._dfMonthly = self._dfExt.groupby(["YM", "MONTH"]).mean(numeric_only=True)
         self._dfMonthly = self._dfMonthly.reset_index()
 
         # Tyzdenne priemery
-        self._dfWeekly = self._dfExt.groupby(["YW", "WEEK"]).mean()
+        self._dfWeekly = self._dfExt.groupby(["YW", "WEEK"]).mean(numeric_only=True)
         self._dfWeekly = self._dfWeekly.reset_index()
 
     def getDFYearly(self):

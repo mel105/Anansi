@@ -40,22 +40,12 @@ import lib.decoder as dc
 import lib.config as cfg
 import lib.MAD as md
 import lib.SSA as ssa
-import lib.charts as cha
+import lib.approx_fft as aprx
+from scipy.signal import welch
 
 import numpy as np
 import datetime as dat
 import plotly.graph_objects as go
-import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import PolynomialFeatures
-from scipy.fft import fft, fftfreq
-
-# from PRML.prml.preprocess import PolynomialFeature
-# from PRML.prml.linear import (
-#     LinearRegression,
-#     RidgeRegression,
-#     BayesianRegression
-# )
 
 np.random.seed(1234)
 
@@ -63,51 +53,6 @@ pio.renderers.default = 'browser'
 
 warnings.filterwarnings("ignore")
 
-
-def test():
-
-    x_train, y_train = create_toy_data(func, 1000, 0.1)
-    x_test = np.linspace(0, 1, 100)
-    y_test = func(x_test)
-
-    err = []
-    dg = []
-    for i in range(100):
-
-        poly = np.polyfit(x_test, y_test, deg=i)
-        y_approx = np.polyval(poly, x_test)
-        dg.append(i)
-        err.append(rmse(y_test, y_approx))
-
-    fo = go.Figure()
-    fo.add_trace(go.Scatter(x=x_train, y=y_train, mode="markers"))
-    fo.add_trace(go.Scatter(x=x_test, y=y_test, mode="lines"))
-    fo.add_trace(go.Scatter(x=x_test, y=y_approx, mode="lines"))
-
-    fo.show()
-
-    fo1 = go.Figure()
-    fo1.add_trace(go.Scatter(x=dg, y=err, mode="lines+markers"))
-    fo1.show()
-
-    return 0
-
-
-def create_toy_data(func, sample_size, std):
-    x = np.linspace(0, 1, sample_size)
-    t = func(x) + np.random.normal(scale=std, size=x.shape)
-    return x, t
-
-
-def func(x):
-    return np.sin(2 * np.pi * x/4)
-
-
-def rmse(a, b):
-    return np.sqrt(np.mean(np.square(a - b)))
-
-
-# OSTRA FUNKCE
 
 def run():
 
@@ -130,6 +75,7 @@ def run():
     time_data_s = time_data_s - time_data_s[0]
     vals_data = decObj.getDF()["UFGr"]
 
+    # ######################################################### OUTLIERS
     # Odhad a eliminovanie realnych odlahlych pozorovani
     vals_median, MAD, lowIdx, uppIdx = md.MAD(vals_data)
     # fo = md.plot(time_data, vals_data, lowIdx, uppIdx)
@@ -139,6 +85,7 @@ def run():
     # fo = md.plot(time_data, out, lowIdx, uppIdx)
     # fo.show()
 
+    # ######################################################### SSA SMOOTHING
     # Vyhladenie redukovaneho casoveho radu
     L = math.floor(decObj.getDF().shape[0]/2)  # max hodnota okna, v ktorom sa vysetruju vlastne vektory
     F_ssa = ssa.SSA(out_data, L)
@@ -151,45 +98,123 @@ def run():
     # origs = F_ssa.orig_TS
     # cha.ssaPlot(time_data, origs, ssa_data, noise)
 
-    # Spracovanie modelu
-    deg_vec = []
-    err_vec = []
+    # ######################################################### FFT APPROXIMATION
+    sig, fft_x_orig, fft_y_orig, fft_x_r, fft_y_r, fft_x, fft_y, _, _, peaks =\
+        aprx.reconstruct_from_fft(ssa_data, frac_harmonics=0.02)
 
-    for deg_index in range(16):
-        print(deg_index)
-        poly = np.polyfit(time_data_s, ssa_data, deg=deg_index)
+    # ######################################################### FORECASTING
+    n_future = 50  # pocet dni, ktore chcem predikovat
 
-        y_approx = np.polyval(poly, time_data_s)
-        deg_vec.append(deg_index)
-        err_vec.append(rmse(ssa_data, y_approx))
+    # suhrna tabulka, kde su nejake statistiky a treba prediction for last 50 days in total is XXX kWh
 
-    # Validacia modelu
-    fo = go.Figure()
-    fo.add_trace(go.Scatter(x=time_data, y=ssa_data, mode="lines"))
-    fo.add_trace(go.Scatter(x=time_data, y=y_approx, mode="lines"))
-    fo.show()
+    # ######################################################### RESULTS VISUALISATION
+    # Zobrazenie orig dat bez trendu a trend samostatne
+    z2 = np.polyfit(np.arange(0, ssa_data.size), ssa_data, 2)
+    p2 = np.poly1d(z2)
+    yvalues_trend = p2(np.arange(0, ssa_data.size))
+    yvalues_detrended = ssa_data - yvalues_trend
 
     fo1 = go.Figure()
-    fo1.add_trace(go.Scatter(x=deg_vec, y=err_vec, mode="lines+markers"))
-    fo1.show()
+    fo1.add_trace(go.Scatter(x=time_data, y=yvalues_detrended, name="Analysed data", mode="lines",
+                             line=dict(color="royalblue", width=3)))
+    fo1.add_trace(go.Scatter(x=time_data, y=yvalues_trend, name="Trend", mode="lines",
+                             line=dict(color="black", width=4, dash='dot')))
+    fo1.update_layout(title='Presentation of de-trended analysed data',
+                      xaxis_title="Time #day",
+                      yaxis_title="Real values [kWh]",
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=1.02,
+                          xanchor="right",
+                          x=1
+                      )
+                      )
+    # fo1.show()
 
-    # fourierova transformace
-    yf = fft(ssa_data)
-    N = L*2
-    T = 1
-    xf = fftfreq(N, T)[:N//2]
+    # Zobrazenie frekvencneho spektra a PSD (Power Spectral Density)
+    psd_x, psd_y = welch(yvalues_detrended)
+    peak_fft_x, peak_fft_y = fft_x_r[peaks], fft_y_r[peaks]
 
     fo2 = go.Figure()
-    fo2.add_trace(go.Scatter(x=xf, y=2.0/N * np.abs(yf[0:N//2]), mode="lines"))
-    fo2.show()
+    fo2.add_trace(go.Scatter(x=fft_x_r, y=fft_y_r, name="FFT", mode="lines",
+                             line=dict(color="royalblue", width=2)))
+    fo2.add_trace(go.Scatter(x=psd_x, y=np.sqrt(psd_y)*100, name="PSD", mode="lines",
+                             line=dict(color="red", width=2, dash='dot')))
+    fo2.update_layout(title='Presentation of Fourier frequency spectrum as well as Power density spectrum',
+                      xaxis_title="Frequency [Hz]",
+                      yaxis_title="Spectrum",
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=1.02,
+                          xanchor="right",
+                          x=1
+                      )
+                      )
 
-    # Spracovanie forecastu
+    text_list = []
+    xl_list = []
+    yl_list = []
+    for ii in range(len(peaks)):
+        xl, yl = peak_fft_x[ii], peak_fft_y[ii]
+        T = 1/xl
+        text_label = "  f = {:.2f}\n  T = {:.2f}".format(xl, T)
+        xl_list.append(xl)
+        yl_list.append(yl)
+        text_list.append(text_label)
+
+    fo2.add_trace(go.Scatter(x=xl_list, y=yl_list, mode="text", text=text_list,
+                             textposition="top center"))
+    # fo2.show()
+
+    # Zobrazenie aproximacie casovej rady pomocou FFT
+    fo3 = go.Figure()
+    fo3.add_trace(go.Scatter(x=time_data, y=ssa_data, name="Analysed time series", mode="lines",
+                             line=dict(color="royalblue", width=3)))
+    fo3.add_trace(go.Scatter(x=time_data, y=sig, name="Reconstructed time series", mode="lines",
+                             line=dict(color="tomato", width=3)))
+    fo3.update_layout(title="Presentation of analysed time series vs reconstructed time series with \n" +
+                      "application of inverse Fourier transform",
+                      xaxis_title="Time #day",
+                      yaxis_title="Real values [kWh]",
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=1.02,
+                          xanchor="right",
+                          x=1
+                      )
+                      )
+
+    # fo3.show()
 
     return decObj, confObj
+
+
+def fft_reconstruction(t, am, f, n_harm=50):
+
+    n = f.size
+    # t = np.arange(0, n)
+
+    indexes = list(range(n))
+
+    # sort indexes by amplitudes, higher to lower
+    indexes.sort(key=lambda i: np.absolute(am[i]))
+    indexes.reverse()
+
+    restored_sig = np.zeros(t.size)
+
+    for i in indexes[:1+n_harm]:
+
+        ampli = np.absolute(am[i]) / n   # amplitude
+        phase = np.angle(am[i])          # phase
+
+        restored_sig += ampli * np.cos(2 * np.pi * f[i] * t + phase)
+    return restored_sig
 
 
 # Spustenie spracovania dat
 if __name__ == "__main__":
 
     data,  conf = run()
-    # test()

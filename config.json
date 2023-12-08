@@ -1,6 +1,6 @@
 {
     "setInput":{
-            "inpFileName": ["PYTHON"],
+            "inpFileName": ["UFG"],
             "inpLocalPath":"/home/mel/Dokumenty/M/Anansi/data"
        },
     "setOutput":{
@@ -15,7 +15,7 @@
             "dend":"2023-04-05 00:00:00"
     },
     "setDecoder":{
-                "centering": 1,
+                "centering": 0,
                 "investLin": 0
     
     },
