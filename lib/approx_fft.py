@@ -214,8 +214,9 @@ def restore_signal_from_fft(fft_x, fft_y, N, extrapolate_with, frac_harmonics):
         ampli = np.absolute(fft_y[i]) / N
         phase = np.angle(fft_y[i])
         restored_sig += ampli * np.cos(2 * np.pi * fft_x[i] * xvalues_full + phase)
+
     # return the restored signal plus the previously calculated trend
-    return restored_sig
+    return restored_sig, indices, no_harmonics
 
 
 def reconstruct_from_fft(yvalues,
@@ -261,8 +262,8 @@ def reconstruct_from_fft(yvalues,
     xvalues_full = np.arange(0, N + extrapolate_with)
 
     # inverzne spracovanie casoveho radu za predpokladu vyberu najvyznamnejsich amplitud
-    restored_sig = restore_signal_from_fft(fft_x, fft_y, N, extrapolate_with, frac_harmonics)
+    restored_sig, idx, noHarm = restore_signal_from_fft(fft_x, fft_y, N, extrapolate_with, frac_harmonics)
     restored_sig = restored_sig + p2(xvalues_full)
 
     return restored_sig[-extrapolate_with:], fft_x_orig, fft_y_orig, fft_x_r, fft_y_r, fft_x, fft_y, xvalues,\
-        yvalues, peaks
+        yvalues, peaks, idx, noHarm, p2
