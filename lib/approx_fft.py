@@ -193,7 +193,7 @@ def get_integer_no_of_periods(yvalues, fft_x, fft_y, frac=1.0, mph=0.4):
     return xvalues_, yvalues_, fft_x_real, fft_y_real, indices_peaks
 
 
-def restore_signal_from_fft(fft_x, fft_y, N, extrapolate_with, frac_harmonics):
+def restore_signal_from_fft(fft_x, fft_y, N, extrapolate_with, frac_harmonics=20):
 
     xvalues_full = np.arange(0, N + extrapolate_with)
     restored_sig = np.zeros(N + extrapolate_with)
@@ -206,8 +206,8 @@ def restore_signal_from_fft(fft_x, fft_y, N, extrapolate_with, frac_harmonics):
     # vyhladim po najvyznamnejsich amplitudach
     indices.reverse()
 
-    max_no_harmonics = len(fft_y)
-    no_harmonics = int(frac_harmonics*max_no_harmonics)
+    # max_no_harmonics = len(fft_y)
+    no_harmonics = frac_harmonics  # int(frac_harmonics*max_no_harmonics)
 
     for i in indices[:1 + no_harmonics * 2]:
 
@@ -220,11 +220,11 @@ def restore_signal_from_fft(fft_x, fft_y, N, extrapolate_with, frac_harmonics):
 
 
 def reconstruct_from_fft(yvalues,
-                         frac_harmonics=1.0,
+                         frac_harmonics=10,
                          deg_polyfit=2,
                          extrapolate_with=0,
                          fraction_signal=1.0,
-                         mph=0.4):
+                         mph=0.22):
     """
     Hlavna funkcia, ktora sluzi k spracovaniu casoveho radu pomocou FFT a nasledne inverzna transformacia je
     spocitana pomocou harmonickej cosinu funkcie

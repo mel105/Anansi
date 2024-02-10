@@ -1,0 +1,90 @@
+{
+    "setInput":{
+            "inpFileName": ["UFG"],
+            "inpLocalPath":"/home/mel/Dokumenty/M/Anansi/data"
+       },
+    "setOutput":{
+            "outLocalPath":"/home/mel/Dokumenty/M/Anansi/results",
+            "figFolderName":"FIG",
+            "csvFolderName":"CSV"
+    },
+    "setInterval":{
+            "beg":"2021-01-01 00:00:00",
+            "end":"2023-04-30 00:00:00",
+            "dbeg":"2022-07-01 00:00:00",
+            "dend":"2023-04-05 00:00:00"
+    },
+    "setDecoder":{
+                "centering": 1,
+                "investLin": 0
+    
+    },
+    "setLSQ":{
+            "maxIter":50,
+            "epsVal":0.001, 
+            "verbosity":1
+    },
+    "setModel":{
+            "alternativeModel":0,
+            "limitRelativeUfG":0.03,
+            "calcWeights":0,
+            "addIntercept":1,
+            "probUp": 0.975 
+    },
+    "setSmoothing":{
+                "smoothingMethod":"SSA",
+                "plotResults":1,
+                "smoothingBin":5,
+                "smoothingAlt": "center"
+    },
+    "setDescriptive":{
+                  "stations": [
+                  "TOTAL NB"],
+                  "verbosity": 1
+    },
+    "setValidation":{
+                  "validation":1,
+                  "prediction":1,
+                  "validchart":1
+    },
+    "setVisualisations":{
+                "relations":0,
+                "groups":0
+    },
+    "setStations":{
+            "stations": [
+"V. Němčice",
+"Sviňomazy",
+"Měcholupy",
+"Bylany",
+"Černá za Bory",
+"Podolí",
+"Dobříň",
+"Třeboradice",
+"Třanovice",
+"Kolín",
+"Děhylov",
+"Lobodice SMP",
+"Barchov",
+"Strážovice",
+"Lodhéřov",
+"Štolmíř",
+"Makotřasy",
+"Bukovany",
+"Krupá",
+"Dub",
+"Pánov",
+"Zvěstov",
+"Bezměrov",
+"Bartoušov",
+"Lobodice JMP",
+"Rybí",
+"Háje",
+"Drahelčice",
+"PZP Štramberk MT1, MT2",
+"PZP Štramberk MT3, MT4",
+"DSO zbytek",
+"MS Bečov"
+      ]
+    }
+}

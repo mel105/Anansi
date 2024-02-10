@@ -415,6 +415,17 @@ class config:
 
         return self._investLin
 
+    def getModel(self):
+        """
+        Function returns the model choice
+
+        Returns
+        -------
+        None.
+
+        """
+        return self._model
+
     ###################################################################################################
     # protected funkcie
 
@@ -442,6 +453,9 @@ class config:
         self._end = cf["setInterval"]["end"]
         self._dbeg = cf["setInterval"]["dbeg"]
         self._dend = cf["setInterval"]["dend"]
+
+        # set model
+        self._model = cf["setModel"]["model"]
 
         # prevezme nastavenie tykajuce sa spracovania dat este v dekodery
         self._centering = cf["setDecoder"]["centering"]

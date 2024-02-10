@@ -1,7 +1,7 @@
 {
     "setInput":{
-            "inpFileName": ["UFG"],
-            "inpLocalPath":"/home/mel/Dokumenty/M/Anansi/data"
+            "inpFileName": ["change_point_full"],
+            "inpLocalPath":"/home/mel/Dokumenty/M/Anansi/data/UfG"
        },
     "setOutput":{
             "outLocalPath":"/home/mel/Dokumenty/M/Anansi/results",
@@ -13,6 +13,9 @@
             "end":"2023-04-30 00:00:00",
             "dbeg":"2022-07-01 00:00:00",
             "dend":"2023-04-05 00:00:00"
+    },
+    "setModel":{
+              "model": "A"
     },
     "setDecoder":{
                 "centering": 0,

@@ -8,6 +8,7 @@ Created on Fri Feb 10 17:02:49 2023
 
 import pandas as pd
 import numpy as np
+import sys
 
 
 class decoder:
@@ -32,8 +33,20 @@ class decoder:
             """
 
         # nacitanie originalnych dat, ktore si pripravime v excel programe
-        self._df = pd.read_excel(filePath+"/"+fileName[0]+".xlsx", verbose=True)
-        self._df.rename(columns={self._df.columns[0]: "DATE"}, inplace=True)
+        # self._df = pd.read_excel(filePath+"/"+fileName[0]+".xlsx", verbose=True)
+        # this part of decoder is adapted to ASTRA results. MELTODO clean the Anansi program generally
+        df = pd.read_csv(filePath+"/"+fileName[0]+".csv", verbose=True)
+        df.rename(columns={df.columns[0]: "DATE"}, inplace=True)
+
+        self._df = pd.DataFrame()
+        self._df["DATE"] = df.DATE.copy()
+        self._df.DATE = self._df.DATE.astype("string")
+
+        if "HOM" in df:
+            self._df["UfG"] = df.HOM.copy()
+        else:
+            print("Program is interrupted!")
+            sys.exit()
 
         # uprava policka v dataframe, ak neobsahuje ziadnu hodnotu
         # dataframe plny true or false
