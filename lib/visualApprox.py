@@ -37,7 +37,7 @@ def plot_data(time_data, ssa_data):
                       )
     # fo1.show()
 
-    return fo1, yvalues_detrended
+    return fo1, yvalues_detrended, yvalues_trend
 
 
 def plot_fft(yvalues_detrended, fft_x_r, fft_y_r, peaks):

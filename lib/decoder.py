@@ -13,28 +13,41 @@ import sys
 
 class decoder:
 
-    def __init__(self, fileName, filePath, confObj):
+    def __init__(self, confObj):
+        """
+        The class covers the data reading depending what the model is required
         """
 
-        Parameters
-        ----------
-        fileName : TYPE
-            DESCRIPTION.
-            filePath : TYPE
-            DESCRIPTION.
-            confObj : TYPE
-            DESCRIPTION.
+        # setting
+        self._conf = confObj
 
-            Returns
-            -------
-            df : TYPE
-            DESCRIPTION.
+        if self._conf.getModel() == "A":
+            # nacitam realne UfG z pripravenej matice vo formate csv alebo xlsx
+            self._model_a_decoder()
 
-            """
+        elif self._conf.getModel() == "B":
+            # nacitam data vhodne pre multiregresny model
+            self._model_b_decoder()
 
-        # nacitanie originalnych dat, ktore si pripravime v excel programe
-        # self._df = pd.read_excel(filePath+"/"+fileName[0]+".xlsx", verbose=True)
+        else:
+            # tu bude model treba zalozeny na ML?
+            print("Required model is not implemented yet!")
+            sys.exit()
+
+    def _model_a_decoder(self):
+        """
+        Function reads the data related to Model A
+
+        Returns
+        -------
+        None.
+
+        """
+
         # this part of decoder is adapted to ASTRA results. MELTODO clean the Anansi program generally
+        fileName = self._conf.getInpFileName()
+        filePath = self._conf.getInpFilePath()
+
         df = pd.read_csv(filePath+"/"+fileName[0]+".csv", verbose=True)
         df.rename(columns={df.columns[0]: "DATE"}, inplace=True)
 
@@ -47,6 +60,16 @@ class decoder:
         else:
             print("Program is interrupted!")
             sys.exit()
+
+        return 0
+
+    def _model_b_decoder(self):
+
+        fileName = self._conf.getInpFileName()
+        filePath = self._conf.getInpFilePath()
+
+        # nacitanie originalnych dat, ktore si pripravime v excel programe
+        self._df = pd.read_excel(filePath+"/"+fileName[0]+".xlsx", verbose=True)
 
         # uprava policka v dataframe, ak neobsahuje ziadnu hodnotu
         # dataframe plny true or false
@@ -71,7 +94,7 @@ class decoder:
         # t.j. od kazdeho stlpca odcitam jeho priemernu hodnotu. Malo by to pomoct potlacit kolinearitu medzi
         # datmi. Najprv odstranim stlpec DATE a mozno aj TOTAL NB, data zcentrujem a potom odstranene stlpce
         # opat pridam do dataframeu
-        if confObj.getCentering():
+        if self._conf.getCentering():
 
             tm = self._df["DATE"]
             self._df = self._df.apply(lambda x: x-x.mean())
@@ -80,7 +103,7 @@ class decoder:
         # Linearna zavislost
         # Vysetrenie linearnej zavislosti vektorov vo vstupnych datach a to z dovodu identifikacie, ktore
         # stlpce dat su ako zavisle
-        if confObj.getInvestLin():
+        if self._conf.getInvestLin():
 
             matrix = self._df
             matrix = matrix.drop(columns="DATE")
@@ -117,8 +140,8 @@ class decoder:
             if j is False:
                 self._dfred = self._dfred.drop(columns=i, axis=1)
 
-        self._dfred = self._dfred[(self._dfred['DATE'] >= confObj.getBeg()) &
-                                  (self._dfred['DATE'] <= confObj.getEnd())]
+        self._dfred = self._dfred[(self._dfred['DATE'] >= self._conf.getBeg()) &
+                                  (self._dfred['DATE'] <= self._conf.getEnd())]
 
         # VYROBENIE PRIEMEROV
         # Rozsirenie full dataframe o styri stlpce: Year-Month, Year, Month, Week. Pre tento ucel pouzival

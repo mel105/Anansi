@@ -45,7 +45,7 @@ class config:
         """
         return self._inpLocalPath
 
-    def getBeg(self):
+    def get_beg_fit(self):
         """
         Funkcia vrati pozadovany zaciatok spracovanej casovej rady
 
@@ -55,9 +55,9 @@ class config:
 
         """
 
-        return self._beg
+        return self._beg_fit
 
-    def getEnd(self):
+    def get_end_fit(self):
         """
         Funkcia vrati pozadovany koniec spracovanej casovej rady
 
@@ -67,11 +67,11 @@ class config:
 
         """
 
-        return self._end
+        return self._end_fit
 
-    def getDBeg(self):
+    def get_beg_tst(self):
         """
-        Funkcia vrati pozadovany zaciatok spracovanej casovej rady ale len pre zobrazenie detailu
+        Funkcia vrati pozadovany zaciatok testovanej casovej rady
 
         Returns
         -------
@@ -79,11 +79,11 @@ class config:
 
         """
 
-        return self._dbeg
+        return self._beg_tst
 
-    def getDEnd(self):
+    def get_end_tst(self):
         """
-        Funkcia vrati pozadovany koniec spracovanej casovej rady, ale len pre zobrazenie detailu rady
+        Funkcia vrati pozadovany koniec testpvamej casovej rady.
 
         Returns
         -------
@@ -91,7 +91,31 @@ class config:
 
         """
 
-        return self._dend
+        return self._end_tst
+
+    def get_beg_frc(self):
+        """
+        Funkcia vrati pozadovany zaciatok casovej rady forecastu
+
+        Returns
+        -------
+        None.
+
+        """
+
+        return self._beg_frc
+
+    def get_end_frc(self):
+        """
+        Funkcia vrati pozadovany koniec casovej rady forecastu.
+
+        Returns
+        -------
+        None.
+
+        """
+
+        return self._end_frc
 
     def getEpsVal(self):
         """
@@ -417,7 +441,7 @@ class config:
 
     def getModel(self):
         """
-        Function returns the model choice
+        Function returns the model configuration that was selected
 
         Returns
         -------
@@ -448,14 +472,17 @@ class config:
         self._figFolderName = cf["setOutput"]["figFolderName"]
         self._csvFolderName = cf["setOutput"]["csvFolderName"]
 
-        # prevezme nastavenie tykajuce sa intervalu spracovanej rady
-        self._beg = cf["setInterval"]["beg"]
-        self._end = cf["setInterval"]["end"]
-        self._dbeg = cf["setInterval"]["dbeg"]
-        self._dend = cf["setInterval"]["dend"]
+        # prevezme nastavenie tykajuce sa intervalu spracovanej rady, intervalu testovanej rady a intervalu
+        # tykajuci sa forecastu.
+        self._beg_fit = cf["setIntervals"]["beg_fit"]
+        self._end_fit = cf["setIntervals"]["end_fit"]
+        self._beg_tst = cf["setIntervals"]["beg_tst"]
+        self._end_tst = cf["setIntervals"]["end_tst"]
+        self._beg_frc = cf["setIntervals"]["beg_frc"]
+        self._end_frc = cf["setIntervals"]["end_frc"]
 
         # set model
-        self._model = cf["setModel"]["model"]
+        self._model = cf["setModelSelection"]["model"]
 
         # prevezme nastavenie tykajuce sa spracovania dat este v dekodery
         self._centering = cf["setDecoder"]["centering"]

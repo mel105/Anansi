@@ -17,6 +17,7 @@ def forecast(time_data, ssa_data, n_future, indexes, noHarm, fft_x, fft_y, trd):
     n = n_fit+n_future
     frc_time = np.arange(0, n)
     frc_signal = np.zeros(n)
+
     # 1. forecast pomocou harmonickej funkcie
     for i in indexes[:1 + noHarm * 2]:
 
@@ -28,6 +29,7 @@ def forecast(time_data, ssa_data, n_future, indexes, noHarm, fft_x, fft_y, trd):
     frc_signal = frc_signal + trd(frc_time)
 
     # 2. uprava casoveho vektoru tak, aby som vyrobil timedate
+    time_data = pd.to_datetime(time_data)
     time_data_ex = time_data.copy()
     mBeg = time_data.iloc[-1]
     mEnd = mBeg + dat.timedelta(n_future-1)

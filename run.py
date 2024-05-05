@@ -36,18 +36,20 @@ import plotly.io as pio
 import warnings
 import math
 import lib.support as sp
-import lib.decoder as dc
+
 import lib.config as cfg
-import lib.MAD as md
+
 import lib.SSA as ssa
-import lib.approx_fft as aprx
-import lib.visualApprox as va
-import lib.forecast as frc
+
+
+import sys
 
 import numpy as np
 import datetime as dat
 import pathlib
 import os
+
+import lib.process_model_A as ma
 
 np.random.seed(1234)
 
@@ -66,85 +68,22 @@ def run():
     sp.checkFolder(confObj.getOutLocalPath()+"/"+confObj.getFigFolderName())
     sp.checkFolder(confObj.getOutLocalPath()+"/"+confObj.getCsvFolderName())
 
-    # Spracovanie dat zavisi na volbe modelu. Takze v prvom rade si
-    #
+    # Spracovanie dat zavisi na volbe modelu. Takze v prvom rade si z konfiguraku nacitam volbu modelu a podla
+    # zvoleneho modelu spracujem data
+    if confObj.getModel() == "A":
+        print("Model A is processed")
+        ma.process_Model_A(confObj)
 
-    # Nacitanie realnych strat
-    fileName = confObj.getInpFileName()
-    filePath = confObj.getInpFilePath()
-    decObj = dc.decoder(fileName, filePath, confObj)
+    elif confObj.getMaxIter() == "B":
+        print("Model B is processed")
+    else:
+        print("Required model is not implemented yet")
+        sys.exit()
 
-    time_data = decObj.getDF()["DATE"]
-    time_data_s = time_data - dat.datetime(1900, 1, 1)
-    time_data_s = time_data_s.dt.total_seconds()
-    time_data_s = time_data_s - time_data_s[0]
-    vals_data = decObj.getDF()["UFGr"]
-
-    # ######################################################### OUTLIERS
-    # Odhad a eliminovanie realnych odlahlych pozorovani
-    vals_median, MAD, lowIdx, uppIdx = md.MAD(vals_data)
-    # fo = md.plot(time_data, vals_data, lowIdx, uppIdx)
-    # fo.show()
-
-    out_data = md.replacement(vals_data, lowIdx, uppIdx, vals_median)
-    # fo = md.plot(time_data, out, lowIdx, uppIdx)
-    # fo.show()
-
-    # ######################################################### SSA SMOOTHING
-    # Vyhladenie redukovaneho casoveho radu
-    # L = math.floor(decObj.getDF().shape[0]/2)  # max hodnota okna, v ktorom sa vysetruju vlastne vektory
-    # F_ssa = ssa.SSA(out_data, L)
-
-    # S = 200  # vezmem si prvych S vlastnych vektorov, pomocou ktrorych zrekonstruujem orig. casovu radu
-    # ssa_data = F_ssa.reconstruct(slice(0, S))
-
-    # pokracovanie rekonstrukcie
-    # noise = F_ssa.reconstruct(slice(S+1, L))
-    # origs = F_ssa.orig_TS
-    # cha.ssaPlot(time_data, origs, ssa_data, noise)
-
-    anal_data = vals_data  # ssa_data, out_data alebo vals_data
-    # ######################################################### FFT APPROXIMATION
-    sig, fft_x_orig, fft_y_orig, fft_x_r, fft_y_r, fft_x, fft_y, _, _, peaks, indexes, noHarm, trd =\
-        aprx.reconstruct_from_fft(anal_data)
-
-    # ######################################################### FORECASTING
-    n_future = 95  # pocet dni, ktore chcem predikovat
-
-    sumsOverYears, sumsOverMonths, time_data_ex = \
-        frc.forecast(time_data, anal_data, n_future, indexes, noHarm, fft_x, fft_y, trd)
-
-    # 4, suhrna tabulka, kde su nejake statistiky a treba prediction for last 50 days in total is XXX kWh
-
-    actualPath = pathlib.Path(__file__).parent.resolve()
-    os.makedirs(actualPath, exist_ok=True)
-    print(sumsOverYears)
-    sumsOverYears.to_csv(str(actualPath)+"/results/CSV/sumsOverYears.csv")
-
-    print(sumsOverMonths)
-    sumsOverMonths.to_csv(str(actualPath)+"/results/CSV/sumsOverMonths.csv")
-
-    # ######################################################### RESULTS VISUALISATION
-    fo1, yvalues_detrended = va.plot_data(time_data, anal_data)  # original data visualisation
-    fo1.write_image(str(actualPath)+"/results/FIG/original.png", width=1000, height=650, scale=2)
-    fo1.show()
-
-    fo2 = va.plot_fft(yvalues_detrended, fft_x_r, fft_y_r, peaks)  # results of FFT presentation
-    fo2.write_image(str(actualPath)+"/results/FIG/fft.png", width=1000, height=650, scale=2)
-    fo2.show()
-
-    fo3 = va.plot_approx(time_data, anal_data, sig)  # results of approximation presentation
-    fo3.write_image(str(actualPath)+"/results/FIG/approx.png", width=1000, height=650, scale=2)
-    fo3.show()
-
-    fo4 = va.plot_forecast(time_data_ex, anal_data)  # forecast presentaiton
-    fo4.write_image(str(actualPath)+"/results/FIG/forecast.png", width=1000, height=650, scale=2)
-    fo4.show()
-
-    return decObj, confObj
+    return 0
 
 
 # Spustenie spracovania dat
 if __name__ == "__main__":
 
-    data,  conf = run()
+    run()

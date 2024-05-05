@@ -1,21 +1,23 @@
 {
     "setInput":{
             "inpFileName": ["change_point_full"],
-            "inpLocalPath":"/home/mel/Dokumenty/M/Anansi/data/UfG"
+            "inpLocalPath":"/home/mel/Dokumenty/M/Anansi/data/UfG2"
        },
     "setOutput":{
             "outLocalPath":"/home/mel/Dokumenty/M/Anansi/results",
             "figFolderName":"FIG",
             "csvFolderName":"CSV"
     },
-    "setInterval":{
-            "beg":"2021-01-01 00:00:00",
-            "end":"2023-04-30 00:00:00",
-            "dbeg":"2022-07-01 00:00:00",
-            "dend":"2023-04-05 00:00:00"
+    "setIntervals":{
+            "beg_fit":"2018-01-01 00:00:00",
+            "end_fit":"2023-12-31 00:00:00",
+            "beg_tst":"2024-01-01 00:00:00",
+            "end_tst":"2024-01-26 00:00:00", 
+            "beg_frc":"2024-01-01 00:00:00",
+            "end_frc":"2024-12-31 00:00:00"
     },
-    "setModel":{
-              "model": "A"
+    "setModelSelection":{
+              "model":"A"
     },
     "setDecoder":{
                 "centering": 0,

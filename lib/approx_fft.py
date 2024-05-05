@@ -169,6 +169,7 @@ def construct_fft(yvalues, deg_polyfit=1, real_abs_only=True):
 
         fft_x = fft_x[:len(fft_x)//2]
         fft_y = np.abs(fft_y[:len(fft_y)//2])
+
     return fft_x, fft_y, p2
 
 
